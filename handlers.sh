@@ -79,10 +79,32 @@ desc_newline(){
 }
 
 hurt_player(){
+    screen_flash
     local lose=$1
     (( player_health - lose > 0 )) && (( player_health -= lose ))
     (( player_health - lose <= 0 )) && state="dead"
 }
+
+#-------------------------
+#SCREEN FLASH
+#-------------------------
+
+screen_flash() {
+
+if [[ "${screen_flashing}" = true ]]; then 
+
+printf '%s' "${WHITE_BG}"
+sleep 0.08
+printf '%s' "${RESET_BG}"
+sleep 0.08
+printf '%s' "${RED_BG}"
+sleep 0.08
+printf '%s' "${RESET_BG}"
+
+fi
+}
+
+
 #-------------------------
 #TASTE HANDLER
 #-------------------------

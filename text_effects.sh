@@ -66,3 +66,12 @@ GOLD="${BOLD}${YELLOW}"
 NPC="${BOLD}${MAGENTA}"
 ENEMY="${BOLD}${BRIGHT_RED}"
 LOOT="${BOLD}${BRIGHT_YELLOW}"
+
+# Terminal Backgrounds
+
+WHITE_BG=$"\e]11;#FFFFFF\a"
+RED_BG=$"\e]11;#550000\a"
+GREEN_BG=$"\e]11;#003300\a"
+BLACK_BG=$"\e]11;#000000\a"
+RESET_BG=$"\e]111\a"
+

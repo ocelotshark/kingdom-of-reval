@@ -1,19 +1,31 @@
 #!/usr/bin/env bash
 
-source inventory.sh
+source text_effects.sh
+source room_descriptions.sh
+random_quest_0=""
+random_quest_1=""
+random_quest_2=""
 
-    simple_inventory=("${!player_inventory[@]}")
-    simple_equipment=("${player_equipment[@]}")
+random_theme_picker(){
+for ((i=0;i<3;i++)); do
+local random_theme_idx=$(( RANDOM % ${#all_themes[@]} ))
+local random_theme="${all_themes[$random_theme_idx]}"
+local for_display_theme="${random_theme^^}"
+for_display_theme="${for_display_theme//_/ }"
 
-    for i in "${simple_inventory[@]}"; do
-        if [[ "$noun" == "$i" ]];then
-        echo "found in inventory"
-        fi
-    done
+(( i == 0 )) && random_quest_0="${for_display_theme}"
+(( i == 1 )) && random_quest_1="${for_display_theme}"
+(( i == 2 )) && random_quest_2="${for_display_theme}"
+done
+}
 
-    for i in "${simple_equipment[@]}"; do
-        if [[ "$noun" == "$i" ]];then
-        echo "found in eq"
-        fi
-    done    
-    
+random_theme_picker
+
+clear
+
+echo -e "              QUEST BOARD              \n\n"
+
+echo -e "${UNDERLINE} ${random_quest_0}${RESET}\n"
+echo -e "${UNDERLINE} ${random_quest_1}${RESET}\n"
+echo -e "${UNDERLINE} ${random_quest_2}${RESET}\n"
+

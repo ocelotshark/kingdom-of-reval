@@ -315,13 +315,15 @@ fi
 #-------------------------
 
 rand_theme_and_fill() {
-    selected_theme_idx=$(( RANDOM % ${#all_themes[@]} ))
-    selected_theme="${all_themes[$selected_theme_idx]}"
-    declare -n current_theme="$selected_theme"
-
-    # selected_theme="ashen_volcano_depths"
-    # declare -n current_theme="$selected_theme"
-
+    if [[ -z "$1"]]; then
+        selected_theme_idx=$(( RANDOM % ${#all_themes[@]} ))
+        selected_theme="${all_themes[$selected_theme_idx]}"
+        declare -n current_theme="$selected_theme"
+    else
+        selected_theme="$1"
+        declare -n current_theme="$selected_theme"
+    fi
+    
     banner_title="${selected_theme}"
 
     # build index list

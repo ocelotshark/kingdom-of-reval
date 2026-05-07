@@ -73,6 +73,7 @@ start_combat=true
 char_creation_done=false
 prev_state="nav"
 bonus_health=0
+screen_flashing=true
 
   case $1 in
     -sn|--skipn)
