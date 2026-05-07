@@ -13,34 +13,88 @@ source spells.sh
 source flee.sh
 source skills.sh
 source dungeon_gen.sh
+source character_screen.sh
+source lookarrays.sh
+source items.sh
+source inventory.sh
+source dumb_functions.sh
 
 #-------------------------
 #INIT VARS
 #-------------------------
 
-name="Wesley"
+name=""
+player_rank="bronze"
+class=""
+race=""
+
 location="room_start"
 location_tmp="$location"
 
+lvl=1
+lvl_points=10
+player_xp=0
+xp_to_next_lvl=100
+
+strength=0
+determination=0
+intelligence=0
+
+base_max_health=100
 max_health=100
 player_health=100
 
-max_mana=100
-player_mana=100
+base_max_mana=60
+max_mana=60
+player_mana=60
 mana_recovery=5
 
-player_attack=5
-player_defense=1
-player_skill_points=6
+base_attack=1
+player_attack=0
+base_defense=0
+player_skill_points=0
+
+player_reputation=50
+
 spawn=true
 combat_rank="F"
+base_rank="F"
 
 player_skills=("Cleave" "Shadow Step")
 player_spells=("Fireball" "Magic Missile")
+player_uffs=()
+
 in_random_dungeon=false
 flee_success=false
 first_load=true
+draw_dungeon=true
+state="nav"
+start_combat=true
+char_creation_done=false
+prev_state="nav"
+bonus_health=0
 
+  case $1 in
+    -sn|--skipn)
+      echo "First Load = False"
+      echo "State = Nav"
+      echo "Room = Tutorial End"
+      name="Debugger"
+      class="warrior"
+      race="human"
+      char_creation_done="finished"
+      location="guild_hall_center"
+      first_load=false
+      state="nav"
+      ;;
+    -sc|--skipc)
+      echo "First Load = False"
+      echo "State = Combat"
+      first_load=false
+      state="combat"
+      ;;
+
+  esac
 
 
 #-------------------------
@@ -49,8 +103,7 @@ first_load=true
 
 clear
 desc_room
-state="nav"
-start_combat=true
+
 
 #-------------------------
 #DISPATCHER
@@ -64,7 +117,6 @@ while true; do
 
 
     while [[ "${state}" == "nav" ]]; do
-
     story_mode_parser
 
     done
@@ -75,7 +127,6 @@ while true; do
 
 
     while [[ "${state}" == "chat" ]]; do
-
     chat_parser
 
     done
@@ -101,5 +152,14 @@ while true; do
     clear
 
     done   
+
+#-------------------------
+#CHARACTER SCREEN STATE
+#-------------------------
+
+while [[ "${state}" == "char_screen" ]] do
+char_screen_tui
+
+done
 
 done

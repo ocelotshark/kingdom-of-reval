@@ -1,6 +1,24 @@
 #!/usr/bin/env bash
 
 #-------------------------
+#[ Z ] SPECIAL ENEMIES
+#-------------------------
+
+z_rank_spawner() {
+
+declare -gA z_rank_enemies=(
+
+[DUMMY]=9999
+
+)
+
+ename=$1
+ehp=${z_rank_enemies[$ename]}
+
+}
+
+
+#-------------------------
 #[ F ] RANK ENEMIES
 #-------------------------
 

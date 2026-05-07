@@ -8,6 +8,7 @@ desc_room() {
     [[ ${in_random_dungeon} == false ]] && echo -e "${room_desc[$location]}"
     [[ ${in_random_dungeon} == true ]] && theme_banner="${banner_title//_/ }" && theme_banner="${theme_banner^^}" && echo -e "\e[7m${theme_banner}\e[0m\n"
     [[ ${in_random_dungeon} == true ]] && echo "${random_dungeon_properties["$location,description"]}"
+ 
     if [[ ${in_random_dungeon} == true ]]; then
         random_dungeon_spawner
         obv_exits=()
@@ -24,6 +25,10 @@ desc_room() {
 
 combat_start_handler() {
         case $combat_rank in
+            Z)
+                z_rank_spawner DUMMY
+            ;;
+
             E)
                 e_rank_spawner #SEE ENEMIES.SH
             ;;
@@ -67,18 +72,91 @@ return_check(){
         flee_success=false
     fi
 }
+
+desc_newline(){
+    desc_room
+    echo  
+}
+
+hurt_player(){
+    local lose=$1
+    (( player_health - lose > 0 )) && (( player_health -= lose ))
+    (( player_health - lose <= 0 )) && state="dead"
+}
+#-------------------------
+#TASTE HANDLER
+#-------------------------
+clerk_lick_tries=0
+
+taste_handler(){
+    local noun="${noun// /_}"
+    local simple_inventory=("${!player_inventory[@]}")
+    local simple_equipment=("${player_equipment[@]}")
+    local found=false
+
+    for i in "${simple_inventory[@]}"; do
+        if [[ "$noun" == "$i" ]];then
+            desc_room
+            echo
+            echo -e "${ITALIC}${taste_data[$noun]}${RESET}"
+            found=true
+            return
+        fi
+    done
+
+    for i in "${simple_equipment[@]}"; do
+        if [[ "$noun" == "$i" ]];then
+            desc_room
+            echo        
+            echo -e "${ITALIC}${taste_data[$noun]}${RESET}"
+            found=true
+            return
+        fi
+    done
+
+    case $noun:$location in
+
+    *clerk*:"guild_hall_center")
+            clerk_lick
+            return
+            ;;
+    esac
+    
+[[ "${found}" == false ]] && desc_room ; echo ; echo -e "${ITALIC}You can't taste that${RESET}"
+
+}
+#-------------------------
+#RECOVER
+#-------------------------
+recover_mana() {
+    local mana_add=$1
+    (( player_mana + mana_add <= max_mana )) && (( player_mana += mana_add ))
+    (( player_mana + mana_add > max_mana )) && player_mana=$max_mana
+}
+recover_health() {
+    local health_add=$1
+    (( player_health + health_add <= max_health )) && (( player_health += health_add ))
+    (( player_health + health_add > max_health )) && player_health=$max_health
+}
+
 #-------------------------
 #DEFEND
 #-------------------------
-
 defend_handler() {
+if (( player_defense > 0 )); then
 defend_weight=$(( RANDOM % $player_defense + 2 ))
 defended_damage=$(( eattack / defend_weight ))
 defended_against=$(( eattack - defended_damage ))
-action1="You defended against $defended_against pts! Focusing you recover $mana_recovery pts of mana!"
+action1="You defended against $defended_against pts! Focusing your mana is now $player_mana/$max_mana!"
 action2="$ename hits you for $defended_damage"
 player_health=$(( player_health - defended_damage ))
-player_mana=$(( player_mana + mana_recovery ))
+recover_mana $mana_recovery
+else
+action1="You have zero defense, you defend with hope. Hope isn't very good armor"
+action2="$ename hits you for $eattack"
+player_health=$(( player_health - $eattack ))
+recover_mana $mana_recovery
+fi
 }
 
 #-------------------------
@@ -258,6 +336,8 @@ go_handler() {
             ;;
 
         esac
+        
+        [[ ${draw_dungeon} == true ]] && echo && draw_dungeon 
     fi
 
     story_navigation
@@ -267,6 +347,7 @@ go_handler() {
 #-------------------------
 #LOOK VERB HANDLER
 #-------------------------
+
 
 look_handler() {
 
@@ -282,18 +363,221 @@ look_handler() {
 
     case $noun:$location in
 
-        "pool":"room1")
-            desc_room
-            echo "The water is disgusting"
+        *clerk*:"guild_hall_center")
+            echo "${npc_look[clerk_default]}"
+        ;;
+        "north":"guild_hall_center")
+            echo "${npc_look[clerk_default]}"
+        ;;        
+        *desk*:"guild_hall_center")
+            echo "${npc_look[clerk_default]}"
+        ;;
+        "south":"guild_hall_center")
+            echo "${object_look[fandor_gh_door]}"
+        ;;
+        *door*:"guild_hall_center")
+            echo "${object_look[fandor_gh_door]}"
+        ;;
+        "west":"guild_hall_center")
+            echo "${object_look[fandor_gh_bar]}"
+        ;;
+        *bar*:"guild_hall_center")
+            echo "${object_look[fandor_gh_bar]}"
         ;;
 
         *)
             if [[ -n "${noun}" ]]; then #if its an unknown noun
                 desc_room
-                echo "You don't see $noun"
+                echo -e "${ITALIC}You don't see $noun${RESET}"
             fi
 
     esac      
+}
+
+#-------------------------
+#TAKE VERB HANDLER
+#-------------------------
+
+update_room_after_take(){
+    build_room_desc
+    desc_room
+    echo
+    echo -e "${ITALIC}You take the $noun${RESET}"
+}
+
+nothing_to_take(){
+    desc_room
+    echo
+    echo -e "${ITALIC}You don't see any $noun around here${RESET}"
+}
+
+take_handler() {
+
+    case $noun in
+
+        *)
+            if [[ -z "${noun}" ]]; then #if player just types take
+                desc_room
+                echo
+                echo "You take a deep breath, taking it all in.."
+            fi
+        ;;
+
+    esac
+
+    case $noun:$location in
+
+        *sword*:"fandor_gh_outside")
+            noun="short sword"
+            if [[ "${story_loot[guild_hall_short_sword]}" == true ]];then
+                add_item_handler "$noun"
+                story_loot[guild_hall_short_sword]=false
+                update_room_after_take
+            else
+                nothing_to_take
+            fi
+        ;;
+        *)
+            if [[ -n "${noun}" ]]; then #if its an unknown noun
+                desc_room
+                echo
+                echo -e "${ITALIC}You don't see $noun${RESET}"
+            fi
+
+    esac      
+}
+
+#-------------------------
+#USE VERB HANDLER
+#-------------------------
+
+use_handler() {
+
+    case $noun in
+
+        *)
+            if [[ -z "${noun}" ]]; then #if player just types use
+                read -r -p "Use what? " noun
+                noun="${noun,,}"
+            fi
+        ;;
+
+    esac
+
+    case $noun:$location in
+
+        *board*:"guild_hall_center")
+            echo "YOU USE THE BOARD"
+        ;;
+        *dummy*:"fandor_gh_outside")
+            combat_rank="Z"
+            state="combat"
+        ;;
+        
+        *)
+            if [[ -n "${noun}" ]]; then #if its an unknown noun
+                desc_room
+                echo
+                echo -e "${ITALIC}You can't use $noun${RESET}"
+            fi
+        ;;
+    esac      
+}
+
+#-------------------------
+#Name confirm
+#-------------------------
+
+name_confirm() {
+            read -r -p "Name: " input_name
+            [[ -z "${input_name}" ]] && name_confirm
+            echo "You wrote $input_name, is that right?"
+            read -r -p "Yes or No: " confirm_name
+            confirm_name="${confirm_name,,}"
+
+            
+            [[ "${confirm_name}" == "y"* ]] && name=$input_name && stored_chat_update
+            [[ "${confirm_name}" == "n"* ]] && name_confirm
+            
+            }
+
+#-------------------------
+#class confirm
+#-------------------------
+
+class_confirm() {
+            read -r -p "Class: " input_class
+            [[ -z "${input_class}" ]] && class_confirm
+            input_class="${input_class,,}"
+            case $input_class in
+                w|warrior) input_class="warrior";;
+                c|cleric) input_class="cleric";;
+                m|mage) input_class="mage";;
+                p|paladin) input_class="paladin";;
+                *) echo "Choose a class from the list please" && class_confirm
+            esac
+
+            echo "You chose $input_class, is that right?"
+            read -r -p "Yes or No: " confirm_class
+            confirm_class="${confirm_class,,}"
+
+            
+            [[ "${confirm_class}" == "y"* ]] && class=$input_class && stored_chat_update
+            [[ "${confirm_class}" == "n"* ]] && class_confirm
+            
+            }   
+
+#-------------------------
+#race confirm
+#-------------------------
+
+race_confirm() {
+            read -r -p "Race: " input_race
+            [[ -z "${input_race}" ]] && race_confirm
+            input_race="${input_race,,}"
+            case $input_race in
+                hf|halfling) input_race="halfling" ;;
+                h|human) input_race="human" ;;
+                e|elf) input_race="elf" ;;
+                d|dwarf) input_race="dwarf" ;;
+                o|orc) input_race="orc" ;;
+                *) echo "Choose a race from the list please" && race_confirm
+            esac
+
+            echo "You chose $input_race, is that right?"
+            read -r -p "Yes or No: " confirm_race
+            confirm_race="${confirm_race,,}"
+
+            
+            [[ "${confirm_race}" == "y"* ]] && race=$input_race && stored_chat_update
+            [[ "${confirm_race}" == "n"* ]] && race_confirm
+            
+            } 
+         
+character_creation_handler() {
+
+if [[ "${char_creation_done}" == false ]]; then
+    echo
+    echo "Write your name down"
+    echo
+    name_confirm
+    clear
+    echo -e "${fandor_guild[clerk_class]}" 
+    echo
+    class_confirm
+    clear
+    echo -e "${fandor_guild[clerk_race]}"
+    echo
+    race_confirm
+    clear
+    echo -e "${tutorial[character_screen]}"
+    press_any_to_continue
+    prev_state="chat"
+    char_creation_done=true
+    state="char_screen"
+    location="guild_hall_center"
+fi
+
 }
 
 #-------------------------
@@ -311,19 +595,37 @@ talk_handler() {
         ;;
 
     esac
+    if [[ "${char_creation_done}" == false ]]; then
+        case $noun:$location in
 
-    case $noun:$location in
+            "clerk":"room_reg_tutorial")
+                location="room_tutorial_end"
+                desc_room
+            ;;
 
-        "clerk":"room_reg_tutorial")
-            location="room_tutorial_end"
-            desc_room
-        ;;
+            "clerk":"room_tutorial_end")
+                who="clerk"          
+                state="chat"
+                clear
+                echo -e "${fandor_guild[clerk_introduction]}"
+            ;;
 
-        "clerk":"room_tutorial_end")
-            who="clerk"          
+            *)
+                if [[ -n "${noun}" ]]; then #if its an unknown noun
+                    desc_room
+                    echo "$noun doesn't want to talk to you"
+                fi
+
+        esac      
+    fi
+    if [[ "${char_creation_done}" == "finished" ]]; then
+        case $noun:$location in
+
+        "clerk":"guild_hall_center")
+            who="clerk"
             state="chat"
             clear
-            echo -e "${fandor_guild[clerk_introduction]}"
+            echo -e "${fandor_guild[clerk_default]}"
         ;;
 
         *)
@@ -332,7 +634,8 @@ talk_handler() {
                 echo "$noun doesn't want to talk to you"
             fi
 
-    esac      
+        esac
+    fi     
 }
 
 #-------------------------
@@ -342,28 +645,69 @@ talk_handler() {
 chat_handler() {
 
     case $noun in
-        *bye*)
-            echo "goodbye"
+        *bye*|goodbye)
+            who=""
+            state="nav"
         ;;
 
     esac
+    #### before character is created
+    if [[ "${char_creation_done}" == false ]]; then
+        case $verb:$who in
 
-    case $verb:$who in
 
-        "yes":"clerk")
-            echo "name please"
-        ;;
+            "yes":"clerk")
+                echo "Of course you are. She hands you a document, dips a quill in ink and hands it you."
+                character_creation_handler
+            ;;
 
-        "registration":*)
-            echo "name please"
-        ;;
+            "reg"*:"clerk")
+                echo "She hands you a document, dips a quill in ink and hands it you."
+                character_creation_handler
+            ;;
 
-        *)
-            if [[ -n "${noun}" ]]; then #if its an unknown noun
-                echo "$who doesn't know WHAT you are talking about!"
-            fi
+            "collect"*:"clerk")
+                echo -e "${fandor_guild[clerk_collection]}"
+                echo "She hands you a document, dips a quill in ink and hands it you."
+                character_creation_handler           
+            ;;
 
-    esac      
+            *:"clerk")
+            echo "You're not from around here are you?"
+            echo -e "${fandor_guild[clerk_introduction]}"
+            ;;
+
+
+            *)
+                if [[ -n "${noun}" ]]; then #if its an unknown noun
+                    echo "$who doesn't know WHAT you are talking about!"
+                fi
+
+        esac 
+
+        return     
+    fi
+#### normal after creation
+case $verb:$who in
+
+
+    "yes":"clerk")
+        echo "this is all i know right now."
+    ;;
+
+    *:"clerk")
+    echo "You're not from around here are you?"
+    echo -e "${fandor_guild[clerk_default]}"
+    ;;
+
+
+    *)
+        if [[ -n "${noun}" ]]; then #if its an unknown noun
+            echo "$who doesn't know WHAT you are talking about!"
+        fi
+
+esac          
+
 }
 
     action1="placeholder1"
@@ -384,7 +728,8 @@ clear
 rand=$(( RANDOM % ${#flee[@]} ))
 echo -e "${flee[$rand]}"
 echo -e "\n\n"
-read -r -p 'PRESS ENTER TO CONTINUE' 
+read -r -p 'PRESS ENTER TO CONTINUE'
+combat_rank="$base_rank" 
 state="nav"
 start_combat=true
 flee_success=true
@@ -485,6 +830,10 @@ set_enemy_attack() {
 
     case $combat_rank in
         #EATTACK_RANGES
+        Z)
+        eattack=0
+        ;;
+
         F)
         eattack=$(( RANDOM % 10 + 1 ))
         ;;
@@ -553,7 +902,7 @@ comb_tui() {
             printf "%s ░ " "${player_skills[@]}"
             echo
             echo "B)ack"
-            echo "PA DEBUG: $player_attack"
+#            echo "PA DEBUG: $player_attack"
 
         ;;
 

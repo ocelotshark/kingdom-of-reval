@@ -10,7 +10,7 @@ story_mode_parser() {
         clear
         
             if [[ -z "$input" ]]; then #check if the string is empty
-                continue
+                return
             fi
         
         input=($input) #turn it into an array
@@ -18,12 +18,37 @@ story_mode_parser() {
         
 #verb aliases
         case "$verb" in
+            run) verb="go" ;;
+            walk) verb="go" ;;
+            travel) verb="go" ;;
+            head) verb="go" ;;
+            traverse) verb="go" ;;
+            g) verb="go" ;;
             n) verb="north" ;;
             s) verb="south" ;;
             e) verb="east"  ;;
             w) verb="west"  ;;
-            t) verb="talk" ;;
+            tl) verb="talk" ;;
+            tk) verb="take" ;;
+            get) verb="take" ;;
+            grab) verb="take" ;;
+            pick) verb="take" ;;
             s) verb="start" ;;
+            l) verb="look" ;;
+            lk) verb="look" ;;
+            examine) verb="look" ;;
+            see) verb="look" ;;
+            investigate) verb="look" ;;
+            inspect) verb="look" ;;
+            view) verb="look" ;;
+            u) verb="use" ;;
+            wear) verb="use" ;;
+            equip) verb="use" ;;
+            don) verb="use" ;;
+            wield) verb="use" ;;
+            eat) verb="use" ;;
+            drink) verb="use" ;;
+            lick) verb="taste" ;;
         esac
 
 
@@ -50,6 +75,10 @@ story_mode_parser() {
         case "$noun" in
             registration) noun="clerk" ;;
             *clerk*) noun="clerk"  ;;
+            n) noun="north" ;;
+            s) noun="south" ;;
+            w) noun="west" ;;
+            e) noun="east" ;;
         esac
 
                     
@@ -58,7 +87,7 @@ story_mode_parser() {
 #-------------------------
 #VERB PARSING
 #-------------------------
-if [[ "${first_load}" == true ]]; then
+if [[ "${first_load}" == true ]]; then #FIRST LOAD PARSING
     case $verb in
         start)
             location="room_reg_tutorial"
@@ -75,7 +104,7 @@ if [[ "${first_load}" == true ]]; then
     esac
 fi
 
-if [[ "${first_load}" == false ]]; then
+if [[ "${first_load}" == false ]]; then #REGULAR PARSING
 
     case $verb in
 
@@ -93,21 +122,51 @@ if [[ "${first_load}" == false ]]; then
         ;;
 
         look)
-            look_handler
+            look_parsing_handler "$noun"
         ;;
 
         talk)
             talk_handler
         ;;
 
+        take)
+            take_handler
+        ;;
+
+        use)
+            parse_item_type "$noun"
+        ;;
+
+        inventory|i)
+            view_inventory
+        ;;
+
+        equipment|eq)
+            view_equipment
+        ;;
+
+        remove|rm)
+            remove_equipped_item "$noun"
+        ;;
+
+        character|cs)
+            prev_state="nav"
+            state="char_screen"
+        ;;
+
+        taste)
+            taste_handler
+        ;;
+
         gend)
             in_random_dungeon=true
-            dungeon_gen 6 4
+            dungeon_gen 20 10
             #echo "${rooms[*]}"
             loca_index=$(( RANDOM % ${#rooms[@]} ))
             location="${rooms[loca_index]}"
             location_rd_prev="$location"
             desc_room
+            
             #echo "CURRENT ROOM=$location"
         ;;       
         combat)
@@ -117,6 +176,7 @@ if [[ "${first_load}" == false ]]; then
 
         *)
           echo "what?"
+          desc_room
         ;;
 
     esac
@@ -124,18 +184,28 @@ fi
 
 }
 
-chat_parser () {
+#
+##
+###
+####
+###########################################################################
+####
+###
+##
+#
 
-        return_check
+chat_parser () {
+        [[ "${char_creation_done}" == true ]] && clear && echo -e "${fandor_guild[clerk_reg_finished]}"
+
         noun_array=() #reset noun
 
-            read -r -p "> " input
+            read -r -p "talking to $who> " input
 
         input="${input,,}"
         clear
         
             if [[ -z "$input" ]]; then #check if the string is empty
-                continue
+                return
             fi
         
         input=($input) #turn it into an array
@@ -168,7 +238,6 @@ chat_parser () {
         noun="${noun_array[*]}"
 #noun aliases
         case "$noun" in
-            registration) noun="clerk" ;;
             *clerk*) noun="clerk"  ;;
         esac
 
@@ -180,16 +249,18 @@ chat_parser () {
 #-------------------------
     case $verb in
 
-        registration)
-            chat_handler
+        *bye*|goodbye)
+        [[ "${char_creation_done}" == true ]] && char_creation_done="finished" ; location="guild_hall_center" 
+        who=""
+        noun=""
+        verb=""
+        state="nav"
+        flee_success=true
+        return
         ;;
 
-        no)
-            chat_handler
-        ;;  
-
         *)
-          echo "what?"
+          chat_handler
         ;;
 
     esac
