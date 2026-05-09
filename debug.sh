@@ -3,6 +3,9 @@
 source text_effects.sh
 source room_descriptions.sh
 
+mapfile -t first_names_list < firstnames.txt
+mapfile -t last_names_list < lastnames.txt
+
     quest_material_list=(
         "GOBLIN EAR"
         "TROLL TOENAIL"
@@ -21,15 +24,33 @@ source room_descriptions.sh
         "SLIME CORE"
 )
 
-random_quest_0=""
-random_quest_1=""
-random_quest_2=""
+
+reset_quest=true
 output_random_rank=0
 base_rank="E"
+random_in_progress=false
+state="using_quest_board"
 
 declare -gA random_quest_0_data=()
 declare -gA random_quest_1_data=()
 declare -gA random_quest_2_data=()
+declare -gA in_progress_random_dungeon=()
+
+time_stamp(){
+epoch_seconds=$(date +%s)
+reset_quest_timer=10
+base_epoch_seconds=$(( epoch_seconds + reset_quest_timer ))
+}
+
+reset_quest_handler(){
+    current_epoch_seconds=$(date +%s)
+    if (( current_epoch_seconds > base_epoch_seconds ));then 
+        reset_quest=true
+        time_stamp
+    else
+        reset_quest=false
+    fi    
+}
 
 random_theme_picker(){
 for ((i=0;i<3;i++)); do
@@ -38,14 +59,14 @@ local random_theme="${all_themes[$random_theme_idx]}"
 local for_display_theme="${random_theme^^}"
 for_display_theme="${for_display_theme//_/ }"
 
-(( i == 0 )) && random_quest_0="${for_display_theme}" && random_quest_0_data[theme]="${random_theme}"
-(( i == 1 )) && random_quest_1="${for_display_theme}" && random_quest_1_data[theme]="${random_theme}"
-(( i == 2 )) && random_quest_2="${for_display_theme}" && random_quest_2_data[theme]="${random_theme}"
+(( i == 0 )) && random_quest_0_data[theme_display]="${for_display_theme}" && random_quest_0_data[theme]="${random_theme}"
+(( i == 1 )) && random_quest_1_data[theme_display]="${for_display_theme}" && random_quest_1_data[theme]="${random_theme}"
+(( i == 2 )) && random_quest_2_data[theme_display]="${for_display_theme}" && random_quest_2_data[theme]="${random_theme}"
 done
 }
 
 random_rank_gen(){
-    local rank=4
+local rank=4
 
 for ((i=0;i<3;i++)); do
 
@@ -62,12 +83,12 @@ for ((i=0;i<3;i++)); do
 
     if (( rank == 0 )); then
         rank=$(( RANDOM % 2 ))
-    elif [[ "${rank}" == [1-5] ]]; then
+    elif (( rank >= 1 && rank <= 5 )); then
         local min=$(( rank - 1 ))
         local max=$(( rank + 1 ))
         rank=$(( RANDOM % ( max - min + 1 ) + min ))
     elif (( rank == 6 )); then
-        rank=$(( RANDOM % ( 6 - 5 + 1) + min ))
+        rank=$(( RANDOM % 2 + 5 ))
     fi
 
     case $rank in
@@ -80,9 +101,9 @@ for ((i=0;i<3;i++)); do
         6) rank="S" ;;
     esac
 
-    (( i == 0)) && random_quest_0_data[rank]="${rank}"
-    (( i == 1)) && random_quest_1_data[rank]="${rank}"
-    (( i == 2)) && random_quest_2_data[rank]="${rank}"
+    local -n ref_rank_data="random_quest_${i}_data"
+
+    ref_rank_data[rank]="${rank}"
 
 done
 }
@@ -114,29 +135,142 @@ done
 
 }
 
+random_name_generator(){
+
+for ((i=0;i<3;i++));do    
+    local firstname_idx=$(( RANDOM % ${#first_names_list[@]} ))
+    local firstname="${first_names_list[$firstname_idx]}"
+    local lastname_idx=$(( RANDOM % ${#last_names_list[@]} ))
+    local lastname="${last_names_list[$lastname_idx]}"
+    local fullname="${firstname} ${lastname}"
+
+    (( i == 0)) && random_quest_0_data[rescue_name]="${fullname^^}"
+    (( i == 1)) && random_quest_1_data[rescue_name]="${fullname^^}"
+    (( i == 2)) && random_quest_2_data[rescue_name]="${fullname^^}"
+done
+}
+
+stupid_plural_s_checker(){
+(( ${random_quest_0_data[material_amount]} > 1 )) && random_quest_0_data[amount_is_plural]="S"
+(( ${random_quest_1_data[material_amount]} > 1 )) && random_quest_1_data[amount_is_plural]="S"
+(( ${random_quest_2_data[material_amount]} > 1 )) && random_quest_2_data[amount_is_plural]="S"
+}
+
 type_display_generator(){
 
-[[ "${random_quest_0_data[type]}" == "COLLECT" ]] && random_quest_0_data[type_display]="COLLECT ${random_quest_0_data[material_amount]} \"${random_quest_0_data[material]}\" IN THE\n"
-[[ "${random_quest_1_data[type]}" == "COLLECT" ]] && random_quest_1_data[type_display]="COLLECT ${random_quest_1_data[material_amount]} \"${random_quest_1_data[material]}\" IN THE\n"
-[[ "${random_quest_2_data[type]}" == "COLLECT" ]] && random_quest_2_data[type_display]="COLLECT ${random_quest_2_data[material_amount]} \"${random_quest_2_data[material]}\" IN THE\n" 
+[[ "${random_quest_0_data[type]}" == "COLLECT" ]] && random_quest_0_data[type_display]="COLLECT ${random_quest_0_data[material_amount]} \"${random_quest_0_data[material]}${random_quest_0_data[amount_is_plural]}\" IN THE-\n"
+[[ "${random_quest_1_data[type]}" == "COLLECT" ]] && random_quest_1_data[type_display]="COLLECT ${random_quest_1_data[material_amount]} \"${random_quest_1_data[material]}${random_quest_1_data[amount_is_plural]}\" IN THE-\n"
+[[ "${random_quest_2_data[type]}" == "COLLECT" ]] && random_quest_2_data[type_display]="COLLECT ${random_quest_2_data[material_amount]} \"${random_quest_2_data[material]}${random_quest_2_data[amount_is_plural]}\" IN THE-\n" 
 
-[[ "${random_quest_0_data[type]}" == "CLEAR ALL MONSTERS" ]] && random_quest_0_data[type_display]="CLEAR ALL MONSTERS IN THE\n"
-[[ "${random_quest_1_data[type]}" == "CLEAR ALL MONSTERS" ]] && random_quest_1_data[type_display]="CLEAR ALL MONSTERS IN THE\n"
-[[ "${random_quest_2_data[type]}" == "CLEAR ALL MONSTERS" ]] && random_quest_2_data[type_display]="CLEAR ALL MONSTERS IN THE\n"
+[[ "${random_quest_0_data[type]}" == "CLEAR ALL MONSTERS" ]] && random_quest_0_data[type_display]="CLEAR ALL MONSTERS IN THE-\n"
+[[ "${random_quest_1_data[type]}" == "CLEAR ALL MONSTERS" ]] && random_quest_1_data[type_display]="CLEAR ALL MONSTERS IN THE-\n"
+[[ "${random_quest_2_data[type]}" == "CLEAR ALL MONSTERS" ]] && random_quest_2_data[type_display]="CLEAR ALL MONSTERS IN THE-\n"
+
+[[ "${random_quest_0_data[type]}" == "RESCUE" ]] && random_quest_0_data[type_display]="RESCUE ${random_quest_0_data[rescue_name]} IN THE-\n"
+[[ "${random_quest_1_data[type]}" == "RESCUE" ]] && random_quest_1_data[type_display]="RESCUE ${random_quest_1_data[rescue_name]} IN THE-\n"
+[[ "${random_quest_2_data[type]}" == "RESCUE" ]] && random_quest_2_data[type_display]="RESCUE ${random_quest_2_data[rescue_name]} IN THE-\n"
 
 }
 
-random_theme_picker
-random_rank_gen
-random_quest_type_generator
-collect_generator
-type_display_generator
+take_quest() {
+    local quest_num="$1"
+    local -n quest_data
 
-clear
+    case "$quest_num" in
+        1) quest_data=random_quest_0_data ;;
+        2) quest_data=random_quest_1_data ;;
+        3) quest_data=random_quest_2_data ;;
+        *) return 1 ;;
+    esac
 
-echo -e "              QUEST BOARD              \n\n"
+    for key in "${!quest_data[@]}"; do
+        in_progress_random_dungeon["$key"]="${quest_data[$key]}"
+    done
 
-echo -e "${random_quest_0_data[type_display]}${UNDERLINE}${random_quest_0} RANK:${random_quest_0_data[rank]}${RESET}\n"
-echo -e "${random_quest_1_data[type_display]}${UNDERLINE}${random_quest_1} RANK:${random_quest_1_data[rank]}${RESET}\n"
-echo -e "${random_quest_2_data[type_display]}${UNDERLINE}${random_quest_2} RANK:${random_quest_2_data[rank]}${RESET}\n"
+    random_in_progress=true
+}
 
+read_qb() {
+    while true; do
+        read -r -p "Take Quest #: " quest_choice
+
+        if [[ -z "$quest_choice" ]]; then
+            echo "Enter a quest number or type 'b' or 'back' to quit using the quest board"
+            continue
+        fi
+
+        quest_choice="${quest_choice,,}"
+        return
+    done
+}
+
+confirm_quest() {
+    local confirm_q
+    local q_choice="$1"
+
+    while true; do
+        read -r -p "Accept Quest $q_choice? Y)es, N)o: " confirm_q
+
+        if [[ -z "$confirm_q" ]]; then
+            echo "Type yes or no."
+            continue
+        fi
+
+        confirm_q="${confirm_q,,}"
+
+        case "$confirm_q" in
+            y|yes)
+                take_quest "$q_choice"
+                return
+                ;;
+            n|no)
+                return
+                ;;
+            *)
+                echo "Type yes or no."
+                ;;
+        esac
+    done
+}
+
+#main shit
+time_stamp
+
+while [[ "${state}" == "using_quest_board" ]]; do
+
+    if [[ "${reset_quest}" == true ]];then
+
+        random_theme_picker
+        random_rank_gen
+        random_quest_type_generator
+        collect_generator
+        stupid_plural_s_checker
+        random_name_generator
+        type_display_generator
+        reset_quest_handler
+    else
+        reset_quest_handler
+    fi
+
+    clear
+
+    echo -e "              QUEST BOARD              \n\n"
+    echo "it's currently ${current_epoch_seconds} quest will reset at ${base_epoch_seconds}"
+    echo -e "QUEST [1]    RANK:${random_quest_0_data[rank]}\n${random_quest_0_data[type_display]}${UNDERLINE}${random_quest_0_data[theme_display]} ${RESET}\n"
+    echo -e "QUEST [2]    RANK:${random_quest_1_data[rank]}\n${random_quest_1_data[type_display]}${UNDERLINE}${random_quest_1_data[theme_display]} ${RESET}\n"
+    echo -e "QUEST [3]    RANK:${random_quest_2_data[rank]}\n${random_quest_2_data[type_display]}${UNDERLINE}${random_quest_2_data[theme_display]} ${RESET}\n"
+    echo
+    echo "R)echeck"
+    echo -e "B)ack\n\n"
+    echo -e "Active Quest: RANK:${in_progress_random_dungeon[rank]}\n${in_progress_random_dungeon[type_display]}${UNDERLINE}${in_progress_random_dungeon[theme_display]} ${RESET}\n"
+
+    read_qb
+
+    case $quest_choice in
+        1|2|3) confirm_quest "$quest_choice" ;;
+        r|recheck) : ;;
+        b|back) exit ;;
+        *) echo "Make a valid choice" && read_qb && return ;;
+    esac
+
+done
