@@ -92,6 +92,8 @@ real escape—back to open air, and whatever mess you choose to walk into next."
 [fandor_gh_outside]="You are outside of the guild hall onto a stretch of packed earth and worn stone.
 To the ${BLUE}north${RESET}, the guild’s heavy doors stand open as adventurers come and go beneath its weathered crest. 
 Off to the ${BLUE}west${RESET}, a battered training dummy waits in the dirt, wrapped in fraying rope and scarred by years of practice.
+To the ${BLUE}east${RESET}, is a swirling ${RED}portal${RESET}. The ${RED}portal${RESET} is encased in a dark oak frame
+casting swirls of crimson ripples.
 
 To the ${BLUE}south${RESET}, the ground opens onto the town’s main road—a busy path running west to east through the heart of the settlement, 
 carrying merchants, travelers, and more stories than anyone could count. ${guild_hall_short_sword}"

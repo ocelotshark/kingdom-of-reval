@@ -93,13 +93,13 @@ screen_flash() {
 
 if [[ "${screen_flashing}" = true ]]; then 
 
-printf '%s' "${WHITE_BG}"
+printf '%b' "${WHITE_BG}"
 sleep 0.08
-printf '%s' "${RESET_BG}"
+printf '%b' "${RESET_BG}"
 sleep 0.08
-printf '%s' "${RED_BG}"
+printf '%b' "${RED_BG}"
 sleep 0.08
-printf '%s' "${RESET_BG}"
+printf '%b' "${RESET_BG}"
 
 fi
 }
@@ -489,13 +489,34 @@ use_handler() {
     case $noun:$location in
 
         *board*:"guild_hall_center")
-            echo "YOU USE THE BOARD"
+            state="using_quest_board"
         ;;
         *dummy*:"fandor_gh_outside")
             combat_rank="Z"
             state="combat"
         ;;
-        
+
+        *portal*:"fandor_gh_outside")
+        if [[ "${random_in_progress}" == true ]]; then
+            combat_rank="${in_progress_random_dungeon[rank]}"
+            in_random_dungeon=true
+            dungeon_gen 6 10 "${in_progress_random_dungeon[theme]}"
+            #echo "${rooms[*]}"
+            loca_index=$(( RANDOM % ${#rooms[@]} ))
+            location="${rooms[loca_index]}"
+            location_rd_prev="$location"
+            desc_room
+        else
+            in_random_dungeon=true
+            dungeon_gen 6 10
+            #echo "${rooms[*]}"
+            loca_index=$(( RANDOM % ${#rooms[@]} ))
+            location="${rooms[loca_index]}"
+            location_rd_prev="$location"
+            desc_room
+        fi
+        ;;  
+
         *)
             if [[ -n "${noun}" ]]; then #if its an unknown noun
                 desc_room

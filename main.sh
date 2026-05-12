@@ -17,6 +17,7 @@ source character_screen.sh
 source lookarrays.sh
 source items.sh
 source inventory.sh
+source quest_board.sh
 source dumb_functions.sh
 
 #-------------------------
@@ -74,6 +75,7 @@ char_creation_done=false
 prev_state="nav"
 bonus_health=0
 screen_flashing=true
+random_in_progress=false
 
   case $1 in
     -sn|--skipn)
@@ -158,8 +160,17 @@ while true; do
 #CHARACTER SCREEN STATE
 #-------------------------
 
-while [[ "${state}" == "char_screen" ]] do
+while [[ "${state}" == "char_screen" ]]; do
 char_screen_tui
+
+done
+
+#-------------------------
+#QUEST BOARD SCREEN STATE
+#-------------------------
+
+while [[ "${state}" == "using_quest_board" ]]; do
+quest_board_handler
 
 done
 

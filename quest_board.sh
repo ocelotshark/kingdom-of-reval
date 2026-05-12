@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-source text_effects.sh
-source room_descriptions.sh
-
 mapfile -t first_names_list < firstnames.txt
 mapfile -t last_names_list < lastnames.txt
 
@@ -27,9 +24,6 @@ mapfile -t last_names_list < lastnames.txt
 
 reset_quest=true
 output_random_rank=0
-base_rank="E"
-random_in_progress=false
-state="using_quest_board"
 
 declare -gA random_quest_0_data=()
 declare -gA random_quest_1_data=()
@@ -226,6 +220,9 @@ confirm_quest() {
             n|no)
                 return
                 ;;
+            b|back)
+                state="nav"
+                ;;
             *)
                 echo "Type yes or no."
                 ;;
@@ -239,9 +236,10 @@ press_any_to_continue() {
 }
 
 #main shit
+
 time_stamp
 
-while [[ "${state}" == "using_quest_board" ]]; do
+quest_board_handler() {
 
     if [[ "${reset_quest}" == true ]];then
 
@@ -273,7 +271,7 @@ while [[ "${state}" == "using_quest_board" ]]; do
 
     case $quest_choice in
         1|2|3) 
-        if [[ "${random_in_progress}" == false]];then
+        if [[ "${random_in_progress}" == false ]]; then
             confirm_quest "$quest_choice"
         else
             echo "You can only have one side quest at a time"
@@ -281,8 +279,12 @@ while [[ "${state}" == "using_quest_board" ]]; do
         fi 
         ;;
         r|recheck) : ;;
-        b|back) exit ;;
+        b|back)
+        state="nav"
+        clear
+        desc_newline
+        ;;
         *) echo "Make a valid choice" && read_qb && return ;;
     esac
 
-done
+}

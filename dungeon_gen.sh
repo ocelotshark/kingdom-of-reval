@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+e_spawn_chance=5
+f_spawn_chance=5
+
 declare -A random_dungeon_properties
 
 #-------------------------
@@ -24,11 +27,13 @@ c=$random_c
 room_candidate=()
 birth_chance=3
 
+[[ ! -z "$3" ]] && local themer="$3"
+
 #-------------------------
 #INITIALIZE A RANDOM DUNGEON
 # - CHECK BOUNDS
 # - CHECK NEIGHBORS
-# - NOT MY BEST WORK BUT IM LEANING
+# - NOT MY BEST WORK BUT IM LEARNING
 #-------------------------
 
 random_dungeon_init() {
@@ -245,7 +250,7 @@ draw_dungeon() {
                 fi
             done
 
-            # 🔥 PRIORITY: player > room > empty
+            # player > room > empty
             if [[ "$location" == "$cell" ]]; then
                 printf "♞ "
             elif [[ $is_room == true ]]; then
@@ -314,8 +319,23 @@ fi
 #FILL RANDO DUNGEON WITH ROOM DESCRIPTIONS AND STUFF
 #-------------------------
 
-rand_theme_and_fill() {
-    if [[ -z "$1"]]; then
+shuffle_array() {
+    local array_name="$1"
+    declare -n arr="$array_name"
+
+    local i j temp
+
+    for (( i=${#arr[@]}-1; i>0; i-- )); do
+        j=$(( RANDOM % (i + 1) ))
+
+        temp="${arr[i]}"
+        arr[i]="${arr[j]}"
+        arr[j]="$temp"
+    done
+}
+
+rand_theme_and_fill() { 
+    if [[ -z "$1" ]]; then
         selected_theme_idx=$(( RANDOM % ${#all_themes[@]} ))
         selected_theme="${all_themes[$selected_theme_idx]}"
         declare -n current_theme="$selected_theme"
@@ -323,24 +343,24 @@ rand_theme_and_fill() {
         selected_theme="$1"
         declare -n current_theme="$selected_theme"
     fi
-    
-    banner_title="${selected_theme}"
 
-    # build index list
+    banner_title="$selected_theme"
+
+    # Build index list
     indices=()
     for (( i=0; i<${#current_theme[@]}; i++ )); do
         indices+=("$i")
     done
 
-    # shuffle once
-    shuffled=($(printf "%s\n" "${indices[@]}" | shuf))
+    # shuffle that shit
+    shuffle_array indices
 
     for (( i=0; i<${#rooms[@]}; i++ )); do
-        
+
         room="${rooms[i]}"
 
-        # wrap if more rooms than descriptions
-        idx="${shuffled[i % ${#shuffled[@]}]}"
+        # Wrap if more rooms than descriptions
+        idx="${indices[i % ${#indices[@]}]}"
 
         tmp_desc_pick="${current_theme[$idx]}"
         description_key="${room},description"
@@ -355,7 +375,7 @@ rand_theme_and_fill() {
 
 random_dungeon_init
 candidate_lottery
-rand_theme_and_fill
+rand_theme_and_fill "${themer}"
 
 
 }
@@ -365,8 +385,24 @@ random_dungeon_spawner() {
         F)
             if [[ "$location_rd_prev" != "$location" ]]; then
 
-                spawn_winning_roll=$(( RANDOM % 5 ))
-                spawn_player_roll=$(( RANDOM % 5 ))
+                spawn_winning_roll=$(( RANDOM % $f_spawn_chance ))
+                spawn_player_roll=$(( RANDOM % $f_spawn_chance ))
+
+                if (( spawn_player_roll == spawn_winning_roll )); then
+                    clear
+                    state="combat"
+                fi
+
+                # update AFTER checking
+                location_rd_prev="$location"
+            fi
+        ;;
+
+        E)
+            if [[ "$location_rd_prev" != "$location" ]]; then
+
+                spawn_winning_roll=$(( RANDOM % $e_spawn_chance ))
+                spawn_player_roll=$(( RANDOM % $e_spawn_chance ))
 
                 if (( spawn_player_roll == spawn_winning_roll )); then
                     clear
