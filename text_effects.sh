@@ -75,3 +75,14 @@ GREEN_BG=$"\e]11;#003300\a"
 BLACK_BG=$"\e]11;#000000\a"
 RESET_BG=$"\e]111\a"
 
+# Make printf happy stupid shit ANSI-C
+
+pf_RESET=$'\e[0m'
+pf_BOLD=$'\e[1m'
+pf_DIM=$'\e[2m'
+pf_ITALIC=$'\e[3m'
+pf_UNDERLINE=$'\e[4m'
+pf_BLINK=$'\e[5m'
+pf_REVERSE=$'\e[7m'
+pf_HIDDEN=$'\e[8m'
+pf_STRIKE=$'\e[9m'

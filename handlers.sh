@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+#enemy attack damage based on rank
+f_max_damage=10
+f_min_damage=1
+e_max_damage=20
+e_min_damage=4
+
 #-------------------------
 #DESCRIBE ROOM
 #-------------------------
@@ -16,6 +22,7 @@ desc_room() {
         obv_exit_checker_south
         obv_exit_checker_east
         obv_exit_checker_west
+        exit_checker
         if [[ "${state}" != "combat" ]];then
             echo
             printf "%s • " "Obvious Exits: ${obv_exits[@]}"
@@ -253,6 +260,15 @@ valid=false
 #RANDOM DUNGEON OBVIOUS EXITS
 #-------------------------
 
+exit_checker(){
+
+if [[ "${location}" == "${EXIT}" ]]; then
+    valid=true
+    obv_exits+=("${pf_REVERSE}Exit${pf_RESET}")    
+fi
+
+}
+
 obv_exit_checker_north() {
 row="${location%%,*}"
 col="${location##*,}"
@@ -263,8 +279,8 @@ valid=false
                     if [[ "$nuu" == "${rooms[i]}" ]]; then
                         valid=true
                         obv_exits+=("North")    
-                        break
                     fi
+
                 done
 }
 
@@ -277,9 +293,9 @@ valid=false
                 for (( i=0; i<${#rooms[@]}; i++ )); do
                     if [[ "$nuu" == "${rooms[i]}" ]]; then
                         valid=true
-                        obv_exits+=("South")                            
-                        break       
+                        obv_exits+=("South")                                
                     fi
+
                 done
 }
 
@@ -292,9 +308,9 @@ valid=false
                 for (( i=0; i<${#rooms[@]}; i++ )); do
                     if [[ "$nuu" == "${rooms[i]}" ]]; then
                         valid=true
-                        obv_exits+=("West")                           
-                        break       
+                        obv_exits+=("West")                                 
                     fi
+
                 done
 }
 
@@ -308,8 +324,8 @@ valid=false
                     if [[ "$nuu" == "${rooms[i]}" ]]; then
                         valid=true
                         obv_exits+=("East")    
-                        break
                     fi
+
                 done
 }
 
@@ -757,6 +773,29 @@ esac
     action2="placeholder2"
 
 
+#-------------------------
+#IS ENEMY DEAD HANDLERS
+#-------------------------
+completed_quest_checker(){
+    if [[ "${in_progress_random_dungeon[type]}" == "CLEAR ALL MONSTERS" ]];then
+        if (( "${in_progress_random_dungeon[enemies_killed]}" >= "${in_progress_random_dungeon[total_enemies]}" ));then
+            in_progress_random_dungeon[state]="complete"
+        fi
+    fi
+}
+
+death_handler(){
+    enemy_dead=false
+    if (( ehp <= 0 ));then
+        (( enemies_killed_stat++ ))
+        [[ "${in_progress_random_dungeon[type]}" == "CLEAR ALL MONSTERS" ]] && (( in_progress_random_dungeon[enemies_killed]++ ))
+        state="nav"
+        start_combat=true
+        flee_success=true
+        completed_quest_checker
+        enemy_dead=true
+    fi
+}
 
 #-------------------------
 #FLEE HANDLER
@@ -768,7 +807,7 @@ winning_number=$(( RANDOM % 4 + 1 ))
 
 if (( $player_number == $winning_number )); then
 clear
-rand=$(( RANDOM % ${#flee[@]} ))
+local rand=$(( RANDOM % ${#flee[@]} ))
 echo -e "${flee[$rand]}"
 echo -e "\n\n"
 read -r -p 'PRESS ENTER TO CONTINUE'
@@ -813,6 +852,7 @@ for (( i=0; i<${#player_skills[@]}; i++ ));do
                     if (( ${player_skill_points} - ${skill_cost} > -1 )); then
                         player_skill_points=$(( ${player_skill_points} - ${skill_cost} ))
                         ehp=$((ehp - skill_damage))
+                        death_handler ; [[ "${enemy_dead}" == true ]] && return                        
                         action1="You cast $lower_case_skills on the $ename for $skill_damage pts! It cost you $skill_cost skill points."
                         player_health=$(( player_health - eattack ))
                         action2="$ename hits you for $eattack pts."
@@ -847,6 +887,7 @@ for (( i=0; i<${#player_spells[@]}; i++ ));do
                     if (( ${player_mana} - ${mana_cost} > -1 )); then
                         player_mana=$(( ${player_mana} - ${mana_cost} ))
                         ehp=$((ehp - magic_damage))
+                        death_handler ; [[ "${enemy_dead}" == true ]] && return
                         action1="You cast $lower_case_spell on the $ename for $magic_damage pts! It cost you $mana_cost mana."
                         player_health=$(( player_health - eattack ))
                         action2="$ename hits you for $eattack pts."
@@ -878,11 +919,11 @@ set_enemy_attack() {
         ;;
 
         F)
-        eattack=$(( RANDOM % 10 + 1 ))
+        eattack=$(( RANDOM % ( f_max_damage - f_min_damage + 1 ) + f_min_damage ))
         ;;
 
         E)
-        eattack=$(( RANDOM % 20 + 1 ))
+        eattack=$(( RANDOM % ( e_max_damage - e_min_damage + 1 ) + e_min_damage ))
         ;;
 
     esac 
@@ -975,6 +1016,7 @@ comb_tui() {
 melee_attack_handler() {
     local attackdamage=$(( RANDOM % 3 + 0 + $player_attack ))
     ehp=$((ehp - attackdamage))
+    death_handler ; [[ "${enemy_dead}" == true ]] && return
     action1="You hit the $ename for $attackdamage pts!"
     player_health=$(( player_health - eattack ))
     action2="$ename hits you for $eattack"

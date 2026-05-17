@@ -1,3 +1,5 @@
+handlers.sh: line 937: syntax error near unexpected token `('
+handlers.sh: line 937: `        eattack=$$(( RANDOM % ( e_max_damage - e_min_damage + 1 ) + e_min_damage ))'
 First Load = False
 State = Nav
 Room = Tutorial End

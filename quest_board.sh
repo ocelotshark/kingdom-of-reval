@@ -144,6 +144,25 @@ for ((i=0;i<3;i++));do
 done
 }
 
+total_enemies_generator(){
+
+for ((i=0; i<3; i++));do
+    local -n ref_rank_data="random_quest_${i}_data[rank]"
+    local add_array_shit="random_quest_${i}_data[total_enemies]"
+    case "${ref_rank_data}" in
+        "F") max_enemies_max_min 6 4 "$add_array_shit" ;;
+        "E") max_enemies_max_min 10 5 "$add_array_shit" ;;
+        "D") max_enemies_max_min 12 8 "$add_array_shit" ;;
+        "C") max_enemies_max_min 15 9 "$add_array_shit" ;;
+        "B") max_enemies_max_min 20 12 "$add_array_shit" ;;
+        "A") max_enemies_max_min 20 15 "$add_array_shit" ;;
+        "S") max_enemies_max_min 30 20 "$add_array_shit" ;;
+        *) echo "Unknown rank: $ref_rank_data" ;;
+    esac
+done
+
+}
+
 stupid_plural_s_checker(){
 (( ${random_quest_0_data[material_amount]} > 1 )) && random_quest_0_data[amount_is_plural]="S"
 (( ${random_quest_1_data[material_amount]} > 1 )) && random_quest_1_data[amount_is_plural]="S"
@@ -181,7 +200,7 @@ take_quest() {
         in_progress_random_dungeon["$key"]="${quest_data[$key]}"
     done
 
-    random_in_progress=true
+    in_progress_random_dungeon[state]=true
 }
 
 read_qb() {
@@ -245,6 +264,7 @@ quest_board_handler() {
 
         random_theme_picker
         random_rank_gen
+        total_enemies_generator
         random_quest_type_generator
         collect_generator
         stupid_plural_s_checker
@@ -259,6 +279,7 @@ quest_board_handler() {
 
     echo -e "              QUEST BOARD              \n\n"
     echo "it's currently ${current_epoch_seconds} quest will reset at ${base_epoch_seconds}"
+    echo -e "q1 tenem=${random_quest_0_data[total_enemies]} : q2 tenem=${random_quest_1_data[total_enemies]} : q3 tenem=${random_quest_2_data[total_enemies]}"
     echo -e "QUEST [1]    RANK:${random_quest_0_data[rank]}\n${random_quest_0_data[type_display]}${UNDERLINE}${random_quest_0_data[theme_display]} ${RESET}\n"
     echo -e "QUEST [2]    RANK:${random_quest_1_data[rank]}\n${random_quest_1_data[type_display]}${UNDERLINE}${random_quest_1_data[theme_display]} ${RESET}\n"
     echo -e "QUEST [3]    RANK:${random_quest_2_data[rank]}\n${random_quest_2_data[type_display]}${UNDERLINE}${random_quest_2_data[theme_display]} ${RESET}\n"
@@ -271,7 +292,7 @@ quest_board_handler() {
 
     case $quest_choice in
         1|2|3) 
-        if [[ "${random_in_progress}" == false ]]; then
+        if [[ "${in_progress_random_dungeon[state]}" == false ]]; then
             confirm_quest "$quest_choice"
         else
             echo "You can only have one side quest at a time"

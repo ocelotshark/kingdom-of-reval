@@ -75,9 +75,10 @@ char_creation_done=false
 prev_state="nav"
 bonus_health=0
 screen_flashing=true
-random_in_progress=false
+in_progress_random_dungeon[state]=false
 
-  case $1 in
+for arg in "$@"; do 
+  case "$arg" in
     -sn|--skipn)
       echo "First Load = False"
       echo "State = Nav"
@@ -90,14 +91,12 @@ random_in_progress=false
       first_load=false
       state="nav"
       ;;
-    -sc|--skipc)
-      echo "First Load = False"
-      echo "State = Combat"
-      first_load=false
-      state="combat"
-      ;;
-
+    -god|--godmode)
+      player_health=9999
+      player_mana=9999
+      player_skill_points=9999
   esac
+done
 
 
 #-------------------------

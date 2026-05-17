@@ -3,7 +3,7 @@
 declare -gA cleave=(
 
 [name]="Cleave"
-[damage]="( RANDOM % player_attack + 20 )"
+[damage]="( RANDOM % ((player_attack + 20)) +1 )"
 [skill_consumption]="1"
 [description]="You deliver a heavy, sweeping strike focused on a single foe, the force of the blow tearing through them with brutal momentum."
 

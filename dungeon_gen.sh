@@ -2,6 +2,17 @@
 
 e_spawn_chance=5
 f_spawn_chance=5
+max_enemies=100
+
+max_enemies_max_min () {
+    local max_enemies_pop=$1
+    local min_enemies_pop=$2
+    local -n total_enemies="$3"
+
+    (( min_enemies_pop > max_enemies_pop )) && echo "min ($min_enemies_pop) cannot be greater than max ($max_enemies_pop) IDIOT" && return 1
+
+    total_enemies=$(( RANDOM % (max_enemies_pop - min_enemies_pop + 1) + min_enemies_pop ))
+}
 
 declare -A random_dungeon_properties
 
@@ -217,18 +228,21 @@ right
 #DEBUGGING TEXT
 #-------------------------
 
-# echo "hod $hod"
-# echo "wod $wod"
-# echo "br aka wod $br"
-# echo "bb aka hod $bb"
-# echo "max rooms: $max_rooms"
-# echo "random_r: $random_r random_c: $random_c"
-# echo "room_zero: $room_zero"
-# echo "array: ${rooms[*]}"
-# echo "r=$r c=$c"
-# echo
-# echo
-# random_dungeon_init
+debug_dungeon(){
+echo "hod $hod"
+echo "wod $wod"
+echo "br aka wod $br"
+echo "bb aka hod $bb"
+echo "max rooms: $max_rooms"
+echo "random_r: $random_r random_c: $random_c"
+echo "room_zero: $room_zero"
+echo "array: ${rooms[*]}"
+echo "r=$r c=$c"
+echo
+echo "${in_progress_random_dungeon[total_enemies]}"
+echo "${in_progress_random_dungeon[enemies_killed]}"
+echo "exit = $EXIT"
+}
 
 #-------------------------
 #DUNGEON MAP
@@ -262,6 +276,7 @@ draw_dungeon() {
         done
         echo
     done
+    debug_dungeon
 }
 
 #-------------------------
@@ -368,6 +383,9 @@ rand_theme_and_fill() {
         random_dungeon_properties["$description_key"]="$tmp_desc_pick"
 
     done
+
+    EXIT_IDX=$(( RANDOM % "${#rooms[@]}" ))
+    EXIT="${rooms[$EXIT_IDX]}"
 }
 #-------------------------
 #EXEC
