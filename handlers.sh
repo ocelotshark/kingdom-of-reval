@@ -513,7 +513,8 @@ use_handler() {
         ;;
 
         *portal*:"fandor_gh_outside")
-        if [[ "${random_in_progress}" == true ]]; then
+        prev_nav_location="${location}" 
+        if [[ "${random_in_progress}" == true ]]; then       
             combat_rank="${in_progress_random_dungeon[rank]}"
             in_random_dungeon=true
             dungeon_gen 6 10 "${in_progress_random_dungeon[theme]}"
@@ -787,6 +788,8 @@ completed_quest_checker(){
 death_handler(){
     enemy_dead=false
     if (( ehp <= 0 ));then
+        enemy_dead_screen
+        press_any_to_continue
         (( enemies_killed_stat++ ))
         [[ "${in_progress_random_dungeon[type]}" == "CLEAR ALL MONSTERS" ]] && (( in_progress_random_dungeon[enemies_killed]++ ))
         state="nav"

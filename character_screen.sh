@@ -166,7 +166,8 @@ echo " I)ntelligence"
 echo
 echo " B)ack"
 echo
-echo -e "${REVERSE} XP TO LVL $next_level - $player_xp/$xp_to_next_lvl ${RESET}" 
+echo -e "${REVERSE} XP TO LVL $next_level - $player_xp/$xp_to_next_lvl ${RESET}"
+echo -e "${REVERSE} GOLD: $player_gold ${RESET}" 
 echo
 read -r -p "> " char_input
 char_input="${char_input,,}"

@@ -1,11 +1,5 @@
 #!/usr/bin/env bash
 
-source text_effects.sh
-player_xp=0
-xp_to_next_level=100
-ename="Orc"
-player_gold=0
-combat_rank="F"
 mapfile -t random_e_death < death.txt
 
 #gold loot
@@ -33,8 +27,6 @@ echo "$gold_gain"
 }
 
 #update ename
-while true; do
-
 
 enemy_dead_screen(){
 clear
@@ -63,10 +55,6 @@ echo "Through your efforts you gain $xp_gain points of experience"
 echo "The $ename drops $gold_gain gold coins"
 echo ; echo
 echo -e "${REVERSE}EXPERIENCE: $player_xp/$xp_to_next_level GOLD: $player_gold${RESET}"
+echo
 
 }
-
-enemy_dead_screen
-
-
-done

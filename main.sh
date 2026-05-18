@@ -19,6 +19,11 @@ source items.sh
 source inventory.sh
 source quest_board.sh
 source dumb_functions.sh
+source death_screen.sh
+clear
+echo "FAKE LOADING TEXT"
+sleep 1
+wait
 
 #-------------------------
 #INIT VARS
@@ -28,6 +33,7 @@ name=""
 player_rank="bronze"
 class=""
 race=""
+player_gold=0
 
 location="room_start"
 location_tmp="$location"

@@ -157,26 +157,34 @@ if [[ "${first_load}" == false ]]; then #REGULAR PARSING
         taste)
             taste_handler
         ;;
-
-        gend)
-            in_random_dungeon=true
-            dungeon_gen 20 10
-            #echo "${rooms[*]}"
-            loca_index=$(( RANDOM % ${#rooms[@]} ))
-            location="${rooms[loca_index]}"
-            location_rd_prev="$location"
-            desc_room
-            
-            #echo "CURRENT ROOM=$location"
-        ;;       
-        combat)
-            state="combat"
-            
+     
+        draw)
+            if [[ "${draw_dungeon}" == false ]];then
+                draw_dungeon=true
+                desc_newline
+                echo "Draw dungeon on"
+            else
+                draw_dungeon=false
+                desc_newline
+                echo "Draw dungeon off"
+            fi                  
         ;;
 
+        "exit")
+        if [[ "${in_random_dungeon}" == true ]]; then
+
+            if [[ "${location}" == "${EXIT}" ]];then
+                in_random_dungeon=false
+                state="nav"
+                location="${prev_nav_location}"
+                desc_newline
+            fi
+        fi
+        ;;        
+
         *)
-          echo "what?"
-          desc_room
+            desc_newline
+            echo "I'm confused on the whole $verb part"
         ;;
 
     esac
