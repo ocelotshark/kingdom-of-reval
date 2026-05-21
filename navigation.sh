@@ -4,9 +4,9 @@ story_navigation () {
 
    if [[ "${in_random_dungeon}" = false ]]; then
         case $noun:$location in
-            
+# GUILD HALL CENTER            
             "east":"guild_hall_center")
-                echo "you use the quest_board"
+                state="using_quest_board"
             ;;
             "south":"guild_hall_center")
                 location="fandor_gh_outside"
@@ -16,14 +16,37 @@ story_navigation () {
                 echo "bar room"
             ;;
             "north":"guild_hall_center")
-                echo "clerk shit"
+                verb="talk"
+                noun="clerk"
+                talk_handle
             ;;
-
+# FANDOR GUILD HALL - OUTSIDE
             "north":"fandor_gh_outside")
                 location="guild_hall_center"
                 desc_room
-            ;;        
-
+            ;;
+            "east":"fandor_gh_outside")
+                use_portal
+            ;;
+            "portal":"fandor_gh_outside")
+                use_portal
+            ;;
+            "west":"fandor_gh_outside")
+                combat_rank="Z"
+                state="combat"
+            ;; 
+            *guild*:"fandor_gh_outside")
+                location="guild_hall_center"
+                desc_room
+            ;;
+            *hall*:"fandor_gh_outside")
+                location="guild_hall_center"
+                desc_room
+            ;;
+            *door*:"fandor_gh_outside")
+                location="guild_hall_center"
+                desc_room
+            ;;              
             *)
                 echo "You can't go that way"
             ;;

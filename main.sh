@@ -20,9 +20,8 @@ source inventory.sh
 source quest_board.sh
 source dumb_functions.sh
 source death_screen.sh
+source quest_rewards.sh
 clear
-echo "FAKE LOADING TEXT"
-sleep 1
 wait
 
 #-------------------------
@@ -60,6 +59,7 @@ base_attack=1
 player_attack=0
 base_defense=0
 player_skill_points=0
+max_skill_points=0
 
 player_reputation=50
 
@@ -70,11 +70,13 @@ base_rank="F"
 player_skills=("Cleave" "Shadow Step")
 player_spells=("Fireball" "Magic Missile")
 player_uffs=()
+declare -gA enemy_kills=()
 
 in_random_dungeon=false
 flee_success=false
 first_load=true
-draw_dungeon=true
+draw_dungeon=false
+set_show_active_quest=true
 state="nav"
 start_combat=true
 char_creation_done=false
@@ -86,9 +88,6 @@ in_progress_random_dungeon[state]=false
 for arg in "$@"; do 
   case "$arg" in
     -sn|--skipn)
-      echo "First Load = False"
-      echo "State = Nav"
-      echo "Room = Tutorial End"
       name="Debugger"
       class="warrior"
       race="human"
@@ -126,7 +125,6 @@ while true; do
 
     while [[ "${state}" == "nav" ]]; do
     story_mode_parser
-
     done
 
 #-------------------------

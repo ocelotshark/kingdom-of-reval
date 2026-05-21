@@ -189,6 +189,53 @@ fi
 }
 
 #-------------------------
+#EXIT DUNGEON HANDLER
+#-------------------------
+exit_dungeon_handler(){
+
+                if [[ "${in_random_dungeon}" == true ]]; then
+                if [[ "${location}" == "${EXIT}" ]];then
+                    if [[ "${in_progress_random_dungeon[state]}" == true ]];then #you on an uncompleted quest homie?
+                        echo "If you leave the dungeon without completing the quest, it will be abandoned"
+                        read -r -p "Are you sure you want to leave? Yes or No: " confirm_leave
+                        echo
+                        case $confirm_leave in
+                            y|yes)
+                                in_progress_random_dungeon=()
+                                in_progress_random_dungeon[state]=false 
+                                in_random_dungeon=false
+                                combat_rank="${base_rank}"
+                                state="nav"
+                                location="${prev_nav_location}"
+                                clear
+                                desc_newline
+                            ;;
+                            n|no)
+                                desc_newline
+                            ;;
+                            *)
+                                desc_newline 
+                                echo "Yes or No?"
+                            ;;
+                        esac
+                    else #you aint on a quest homie
+                        in_random_dungeon=false
+                        state="nav"
+                        location="${prev_nav_location}"
+                        desc_newline
+                    fi
+                else
+                    desc_newline                
+                    echo -e "${ITALIC}You search and search as if your life depends on it, but can't find an exit.${RESET}"
+                fi
+            else
+            desc_newline 
+            echo -e "${ITALIC}You search and search as if your life depends on it, but can't find an exit.${RESET}"
+            fi
+
+}
+
+#-------------------------
 #RANDOM DUNGEON NAVIGATION
 #-------------------------
 
@@ -339,47 +386,117 @@ go_handler() {
             
             "north")
                 rdung_nav_checker_north
-                #echo "location: $location"
-                desc_room
-                #draw_dungeon
-                                
+                desc_room                                
             ;;
 
             "south")
                 rdung_nav_checker_south
-                #echo "location: $location"
-                desc_room
-                #draw_dungeon
-                
+                desc_room                
             ;;
-
             "west")
                 rdung_nav_checker_west
-                #echo "location: $location"
-                desc_room
-                #draw_dungeon
-                
+                desc_room               
             ;;
 
             "east")
                 rdung_nav_checker_east
-                #echo "location: $location"
-                desc_room
-                #draw_dungeon
-                
+                desc_room                
+            ;;
+
+            "exit")
+                exit_dungeon_handler
             ;;
 
             *)
                 echo "You can't go that way"
             ;;
-
         esac
         
-        [[ ${draw_dungeon} == true ]] && echo && draw_dungeon 
+        quest_completed_text 
+        [[ ${draw_dungeon} == true ]] && echo && draw_dungeon
     fi
 
     story_navigation
 
+}
+
+#-------------------------
+#SHOW ACTIVE QUEST
+#-------------------------
+show_active_quest() {
+        if [[ "${in_random_dungeon}" == true ]] && [[ "${in_progress_random_dungeon[state]}" == true ]];then
+            echo
+            echo
+            echo -e "Active Quest: RANK:${in_progress_random_dungeon[rank]}\n${in_progress_random_dungeon[type_display]}${UNDERLINE}${in_progress_random_dungeon[theme_display]} ${RESET}\n"
+        fi
+}
+
+#-------------------------
+#USE PORTAL
+#-------------------------
+
+use_portal(){
+if (( $# == 0 ));then
+    prev_nav_location="${location}" 
+    if [[ "${random_in_progress}" == true ]]; then       
+        combat_rank="${in_progress_random_dungeon[rank]}"
+        in_random_dungeon=true
+        case $combat_rank in
+            "F") local width=4 ; local height=6 ;;
+            "E") local width=6 ; local height=10 ;;
+            "D") local width=10 ; local height=10 ;;
+            "C") local width=12 ; local height=12 ;;
+            "B") local width=12 ; local height=12 ;;
+            "A") local width=15 ; local height=15 ;;
+            "S") local width=20 ; local height=20 ;;
+        esac
+        dungeon_gen $width $height "${in_progress_random_dungeon[theme]}"
+        #echo "${rooms[*]}"
+        loca_index=$(( RANDOM % ${#rooms[@]} ))
+        location="${rooms[loca_index]}"
+        location_rd_prev="$location"
+        desc_room
+    else
+        in_random_dungeon=true
+        case $base_rank in
+            "F") local width=4 ; local height=6 ;;
+            "E") local width=6 ; local height=10 ;;
+            "D") local width=10 ; local height=10 ;;
+            "C") local width=12 ; local height=12 ;;
+            "B") local width=12 ; local height=12 ;;
+            "A") local width=15 ; local height=15 ;;
+            "S") local width=20 ; local height=20 ;;
+        esac
+        dungeon_gen $width $height
+        #echo "${rooms[*]}"
+        loca_index=$(( RANDOM % ${#rooms[@]} ))
+        location="${rooms[loca_index]}"
+        location_rd_prev="$location"
+        desc_room
+    fi
+else
+    local width=$1
+    local height=$2
+    prev_nav_location="${location}" 
+    if [[ "${random_in_progress}" == true ]]; then       
+        combat_rank="${in_progress_random_dungeon[rank]}"
+        in_random_dungeon=true
+        dungeon_gen $width $height "${in_progress_random_dungeon[theme]}"
+        #echo "${rooms[*]}"
+        loca_index=$(( RANDOM % ${#rooms[@]} ))
+        location="${rooms[loca_index]}"
+        location_rd_prev="$location"
+        desc_room
+    else
+        in_random_dungeon=true
+        dungeon_gen $width $height
+        #echo "${rooms[*]}"
+        loca_index=$(( RANDOM % ${#rooms[@]} ))
+        location="${rooms[loca_index]}"
+        location_rd_prev="$location"
+        desc_room
+    fi
+fi
 }
 
 #-------------------------
@@ -422,7 +539,15 @@ look_handler() {
         *bar*:"guild_hall_center")
             echo "${object_look[fandor_gh_bar]}"
         ;;
-
+        *board*:"guild_hall_center")
+            echo "${object_look[quest_board]}"
+        ;;
+        *portal*:"fandor_gh_outside")
+            echo -e "${object_look[fandor_gh_portal]}"
+        ;;
+        *dummy*:"fandor_gh_outside")
+            echo -e "${object_look[dummy_1]}"
+        ;;        
         *)
             if [[ -n "${noun}" ]]; then #if its an unknown noun
                 desc_room
@@ -495,7 +620,7 @@ use_handler() {
 
         *)
             if [[ -z "${noun}" ]]; then #if player just types use
-                read -r -p "Use what? " noun
+                read -r -p "Use what? > " noun
                 noun="${noun,,}"
             fi
         ;;
@@ -507,31 +632,19 @@ use_handler() {
         *board*:"guild_hall_center")
             state="using_quest_board"
         ;;
+        *clerk*:"guild_hall_center")
+            verb="talk"
+            noun="clerk"
+            talk_handler
+        ;;
         *dummy*:"fandor_gh_outside")
             combat_rank="Z"
             state="combat"
         ;;
 
+
         *portal*:"fandor_gh_outside")
-        prev_nav_location="${location}" 
-        if [[ "${random_in_progress}" == true ]]; then       
-            combat_rank="${in_progress_random_dungeon[rank]}"
-            in_random_dungeon=true
-            dungeon_gen 6 10 "${in_progress_random_dungeon[theme]}"
-            #echo "${rooms[*]}"
-            loca_index=$(( RANDOM % ${#rooms[@]} ))
-            location="${rooms[loca_index]}"
-            location_rd_prev="$location"
-            desc_room
-        else
-            in_random_dungeon=true
-            dungeon_gen 6 10
-            #echo "${rooms[*]}"
-            loca_index=$(( RANDOM % ${#rooms[@]} ))
-            location="${rooms[loca_index]}"
-            location_rd_prev="$location"
-            desc_room
-        fi
+            use_portal
         ;;  
 
         *)
@@ -645,7 +758,7 @@ fi
 #-------------------------
 
 talk_handler() {
-
+    
     case $noun in
 
         *)
@@ -684,10 +797,19 @@ talk_handler() {
         "clerk":"guild_hall_center")
             who="clerk"
             state="chat"
-            clear
-            echo -e "${fandor_guild[clerk_default]}"
+            clear ; stored_chat_update
+            echo -e "${fandor_guild[clerk_default_1]}"
+            waiting_chat
+            wait
+            echo -e "${fandor_guild[clerk_default_2]}"
         ;;
 
+        "dummy":"fandor_gh_outside")
+            who="dummy"
+            state="chat"
+            clear ; stored_chat_update
+            dummy_chat
+        ;;           
         *)
             if [[ -n "${noun}" ]]; then #if its an unknown noun
                 desc_room
@@ -705,7 +827,7 @@ talk_handler() {
 chat_handler() {
 
     case $noun in
-        *bye*|goodbye)
+        *bye*|goodbye|gb)
             who=""
             state="nav"
         ;;
@@ -713,11 +835,20 @@ chat_handler() {
     esac
     #### before character is created
     if [[ "${char_creation_done}" == false ]]; then
+
+        case $verb in
+            *bother*) verb="yes";;
+            *annoy*) verb="yes";;
+            *reg*) verb="reg" ;;
+            "register") verb="reg" ;;
+            "registration") verb="reg" ;;
+        esac
+
         case $verb:$who in
 
 
             "yes":"clerk")
-                echo "Of course you are. She hands you a document, dips a quill in ink and hands it you."
+                echo -e "Of course you are. \nShe hands you a document, dips a quill in ink and hands it you."
                 character_creation_handler
             ;;
 
@@ -734,6 +865,7 @@ chat_handler() {
 
             *:"clerk")
             echo "You're not from around here are you?"
+            echo
             echo -e "${fandor_guild[clerk_introduction]}"
             ;;
 
@@ -748,16 +880,50 @@ chat_handler() {
         return     
     fi
 #### normal after creation
+
+case $verb in
+"collection") verb="collect";;
+"turn") verb="collect";;
+"finished") verb="collect";;
+"complete") verb="collect";;
+esac
+
 case $verb:$who in
 
 
-    "yes":"clerk")
-        echo "this is all i know right now."
+    *collect*:"clerk")
+        if [[ "${in_progress_random_dungeon[state]}" == "complete" ]];then
+            echo -e "${fandor_guild[clerk_collect_success_neutral]}"
+
+            combat_rank_lower_cased="${in_progress_random_dungeon[rank],,}"
+
+            gold_reward="${combat_rank_lower_cased}_rank_quest_gold"
+            xp_reward="${combat_rank_lower_cased}_rank_quest_xp"
+            
+            echo
+            echo -e "A pouch containing ${quest_rewards[$gold_reward]} gold coins."
+            echo -e "You feel more experienced. ${quest_rewards[$xp_reward]} experience gained."
+
+            (( player_gold += quest_rewards[$gold_reward] ))
+            (( player_xp += quest_rewards[$xp_reward] ))
+
+            in_progress_random_dungeon=()
+            in_progress_random_dungeon[state]=false
+
+        else
+            echo -e "${fandor_guild[clerk_collect_failure_neutral]}"
+        fi
+
     ;;
 
     *:"clerk")
     echo "You're not from around here are you?"
-    echo -e "${fandor_guild[clerk_default]}"
+    echo
+    echo -e "${fandor_guild[clerk_default_2]}"
+    ;;
+
+    *:"dummy")
+    dummy_chat
     ;;
 
 
@@ -784,6 +950,11 @@ completed_quest_checker(){
         fi
     fi
 }
+quest_completed_text(){
+    if [[ "${in_progress_random_dungeon[state]}" == "complete" ]];then
+        echo -e "\n\n${BG_BLACK}${BLINK}${BRIGHT_WHITE}QUEST COMPLETE${RESET} - TURN INTO A CLERK AT AN ADVENTURES GUILD."
+    fi
+}
 
 death_handler(){
     enemy_dead=false
@@ -791,6 +962,7 @@ death_handler(){
         enemy_dead_screen
         press_any_to_continue
         (( enemies_killed_stat++ ))
+        (( enemy_kills[$ename]++ ))
         [[ "${in_progress_random_dungeon[type]}" == "CLEAR ALL MONSTERS" ]] && (( in_progress_random_dungeon[enemies_killed]++ ))
         state="nav"
         start_combat=true

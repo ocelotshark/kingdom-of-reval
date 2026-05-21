@@ -399,38 +399,42 @@ rand_theme_and_fill "${themer}"
 }
 
 random_dungeon_spawner() {
-    case "$combat_rank" in
-        F)
-            if [[ "$location_rd_prev" != "$location" ]]; then
+    local amount_of_enemies="${in_progress_random_dungeon[total_enemies]}"
+    local killed="${in_progress_random_dungeon[enemies_killed]}"
+    if (( killed < amount_of_enemies )); then
+        case "$combat_rank" in
+            F)
+                if [[ "$location_rd_prev" != "$location" ]]; then
 
-                spawn_winning_roll=$(( RANDOM % $f_spawn_chance ))
-                spawn_player_roll=$(( RANDOM % $f_spawn_chance ))
+                    spawn_winning_roll=$(( RANDOM % $f_spawn_chance ))
+                    spawn_player_roll=$(( RANDOM % $f_spawn_chance ))
 
-                if (( spawn_player_roll == spawn_winning_roll )); then
-                    clear
-                    state="combat"
+                    if (( spawn_player_roll == spawn_winning_roll )); then
+                        clear
+                        state="combat"
+                    fi
+
+                    # update AFTER checking
+                    location_rd_prev="$location"
                 fi
+            ;;
 
-                # update AFTER checking
-                location_rd_prev="$location"
-            fi
-        ;;
+            E)
+                if [[ "$location_rd_prev" != "$location" ]]; then
 
-        E)
-            if [[ "$location_rd_prev" != "$location" ]]; then
+                    spawn_winning_roll=$(( RANDOM % $e_spawn_chance ))
+                    spawn_player_roll=$(( RANDOM % $e_spawn_chance ))
 
-                spawn_winning_roll=$(( RANDOM % $e_spawn_chance ))
-                spawn_player_roll=$(( RANDOM % $e_spawn_chance ))
+                    if (( spawn_player_roll == spawn_winning_roll )); then
+                        clear
+                        state="combat"
+                    fi
 
-                if (( spawn_player_roll == spawn_winning_roll )); then
-                    clear
-                    state="combat"
+                    # update AFTER checking
+                    location_rd_prev="$location"
                 fi
-
-                # update AFTER checking
-                location_rd_prev="$location"
-            fi
-        ;;
-    esac
+            ;;
+        esac
+    fi
 }
 

@@ -36,7 +36,21 @@ Where torchlight meets smoke and the smell of spilled ale never quite leaves the
 
 Scarred mugs, loud laughter, and half-finished stories crowd every inch of it.
 More rumors, contracts, and bad decisions have started here than anyone cares to admit."
+
+[fandor_gh_portal]="The swirling ${RED}${BLINK}portal${RESET} hums with unstable energy, crimson ripples
+twisting endlessly within the dark oak frame. Faint whispers seep from
+its depths, while the air around it feels strangely cold and heavy."
+
+[quest_board]="Weathered parchments cover the quest board, pinned beneath rusted nails
+and stained by rain, blood, and ale. Requests for monster hunts, escorts,
+missing persons, and dungeon expeditions crowd every inch of wood."
+
+[dummy_1]="A weathered training dummy stands here, covered in scars left by recruits
+who were, statistically speaking, ${ITALIC}more promising.${RESET}"
+
+
 )
+
 }
 
 stored_look_update

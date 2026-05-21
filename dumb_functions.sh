@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+prev_dummy_chat=""
 
 clerk_lick() {
     if (( clerk_lick_tries == 0 ));then
@@ -16,3 +17,13 @@ clerk_lick() {
         return
     fi    
 }
+
+dummy_chat(){
+local chatdex=$(( RANDOM % 4 + 1 ))
+if (( prev_dummy_chat == chatdex ));then
+    dummy_chat
+else
+    prev_dummy_chat=$chatdex
+    echo -e "${fandor_guild[dummy_default_$chatdex]}"
+fi
+}  

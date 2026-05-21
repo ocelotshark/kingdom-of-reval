@@ -150,8 +150,8 @@ for ((i=0; i<3; i++));do
     local -n ref_rank_data="random_quest_${i}_data[rank]"
     local add_array_shit="random_quest_${i}_data[total_enemies]"
     case "${ref_rank_data}" in
-        "F") max_enemies_max_min 6 4 "$add_array_shit" ;;
-        "E") max_enemies_max_min 10 5 "$add_array_shit" ;;
+        "F") max_enemies_max_min 4 3 "$add_array_shit" ;;
+        "E") max_enemies_max_min 6 4 "$add_array_shit" ;;
         "D") max_enemies_max_min 12 8 "$add_array_shit" ;;
         "C") max_enemies_max_min 15 9 "$add_array_shit" ;;
         "B") max_enemies_max_min 20 12 "$add_array_shit" ;;
@@ -278,8 +278,8 @@ quest_board_handler() {
     clear
 
     echo -e "              QUEST BOARD              \n\n"
-    echo "it's currently ${current_epoch_seconds} quest will reset at ${base_epoch_seconds}"
-    echo -e "q1 tenem=${random_quest_0_data[total_enemies]} : q2 tenem=${random_quest_1_data[total_enemies]} : q3 tenem=${random_quest_2_data[total_enemies]}"
+    # echo "it's currently ${current_epoch_seconds} quest will reset at ${base_epoch_seconds}"
+    # echo -e "q1 tenem=${random_quest_0_data[total_enemies]} : q2 tenem=${random_quest_1_data[total_enemies]} : q3 tenem=${random_quest_2_data[total_enemies]}"
     echo -e "QUEST [1]    RANK:${random_quest_0_data[rank]}\n${random_quest_0_data[type_display]}${UNDERLINE}${random_quest_0_data[theme_display]} ${RESET}\n"
     echo -e "QUEST [2]    RANK:${random_quest_1_data[rank]}\n${random_quest_1_data[type_display]}${UNDERLINE}${random_quest_1_data[theme_display]} ${RESET}\n"
     echo -e "QUEST [3]    RANK:${random_quest_2_data[rank]}\n${random_quest_2_data[type_display]}${UNDERLINE}${random_quest_2_data[theme_display]} ${RESET}\n"
@@ -287,7 +287,8 @@ quest_board_handler() {
     echo "R)echeck"
     echo -e "B)ack\n\n"
     echo -e "Active Quest: RANK:${in_progress_random_dungeon[rank]}\n${in_progress_random_dungeon[type_display]}${UNDERLINE}${in_progress_random_dungeon[theme_display]} ${RESET}\n"
-
+    echo -e "${tutorial[quest_board_how_to]}"
+    echo
     read_qb
 
     case $quest_choice in

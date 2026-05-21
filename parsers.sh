@@ -2,14 +2,16 @@
 
 story_mode_parser() {
         return_check
+        echo -e "\033[?25h" #show cursor if it gets messed up
+
         noun_array=() #reset noun
 
-            read -r -p "> " input
-
+        read -r -p "> " input
         input="${input,,}"
         clear
         
             if [[ -z "$input" ]]; then #check if the string is empty
+                desc_room
                 return
             fi
         
@@ -24,12 +26,15 @@ story_mode_parser() {
             head) verb="go" ;;
             traverse) verb="go" ;;
             g) verb="go" ;;
+            enter) verb="go" ;;
             n) verb="north" ;;
             s) verb="south" ;;
             e) verb="east"  ;;
             w) verb="west"  ;;
             tl) verb="talk" ;;
+            tlk) verb="talk" ;;
             tk) verb="take" ;;
+            t) verb="take" ;;
             get) verb="take" ;;
             grab) verb="take" ;;
             pick) verb="take" ;;
@@ -49,6 +54,7 @@ story_mode_parser() {
             eat) verb="use" ;;
             drink) verb="use" ;;
             lick) verb="taste" ;;
+            ex) verb="exit" ;;
         esac
 
 
@@ -79,6 +85,8 @@ story_mode_parser() {
             s) noun="south" ;;
             w) noun="west" ;;
             e) noun="east" ;;
+            "quest board") noun="board";;
+            ex) noun="exit" ;;
         esac
 
                     
@@ -169,17 +177,19 @@ if [[ "${first_load}" == false ]]; then #REGULAR PARSING
                 echo "Draw dungeon off"
             fi                  
         ;;
-
-        "exit")
-        if [[ "${in_random_dungeon}" == true ]]; then
-
-            if [[ "${location}" == "${EXIT}" ]];then
-                in_random_dungeon=false
-                state="nav"
-                location="${prev_nav_location}"
+        set_active)
+            if [[ "${set_show_active_quest}" == false ]];then
+                set_show_active_quest=true
                 desc_newline
-            fi
-        fi
+                echo "Showing active quest on"
+            else
+                set_show_active_quest=false
+                desc_newline
+                echo "Showing active quest off"
+            fi 
+        ;;
+        "exit")
+            exit_dungeon_handler
         ;;        
 
         *)
@@ -189,6 +199,7 @@ if [[ "${first_load}" == false ]]; then #REGULAR PARSING
 
     esac
 fi
+    [[ "${set_show_active_quest}" == true ]] && show_active_quest
 
 }
 
@@ -204,15 +215,16 @@ fi
 
 chat_parser () {
         [[ "${char_creation_done}" == true ]] && clear && echo -e "${fandor_guild[clerk_reg_finished]}"
-
         noun_array=() #reset noun
-
-            read -r -p "talking to $who> " input
+            echo
+            chatting_prompt="TALKING TO ${who^^}"
+            read -r -p "$chatting_prompt > " input
 
         input="${input,,}"
         clear
         
             if [[ -z "$input" ]]; then #check if the string is empty
+                chat_handler
                 return
             fi
         
@@ -258,12 +270,16 @@ chat_parser () {
     case $verb in
 
         *bye*|goodbye)
-        [[ "${char_creation_done}" == true ]] && char_creation_done="finished" ; location="guild_hall_center" 
+        #hehe ignore this bandaid underneath please
+        [[ "${char_creation_done}" == true ]] && char_creation_done="finished" && [[ "${location}" == "room_tutorial_end" ]] && location="guild_hall_center" 
         who=""
         noun=""
         verb=""
         state="nav"
         flee_success=true
+        player_health="${max_health}"
+        player_mana="${max_mana}"
+        player_skill_points="${max_skill_points}"
         return
         ;;
 

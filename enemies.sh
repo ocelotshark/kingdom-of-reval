@@ -24,13 +24,13 @@ ehp=${z_rank_enemies[$ename]}
 
 f_rank_spawner() {
 
-f_rank_hp_mod=$(( RANDOM % 31 - 10 ))
+f_rank_hp_mod=$(( RANDOM % (31 - 10 + 1) + 10 ))
 
 declare -gA f_rank_enemies=(
 
-[Orc]=$(( 100 + f_rank_hp_mod ))
-[Goblin]=$(( 60 + f_rank_hp_mod ))
-[Bandit]=$(( 80 + f_rank_hp_mod ))
+[Orc]=$(( 30 + f_rank_hp_mod ))
+[Goblin]=$(( 20 + f_rank_hp_mod ))
+[Bandit]=$(( 15 + f_rank_hp_mod ))
 
 )
 
@@ -48,13 +48,13 @@ ehp=${f_rank_enemies[$random_enemy]}
 
 e_rank_spawner() {
 
-e_rank_hp_mod=$(( RANDOM % 31 - 10 ))
+e_rank_hp_mod=$(( RANDOM % (31 - 10 + 1) + 10 ))
 
 declare -gA e_rank_enemies=(
 
-[Hobgoblin]=$(( 150 + e_rank_hp_mod ))
-[Undead Skeleton]=$(( 100 + e_rank_hp_mod ))
-[Shadow]=$(( 110 + e_rank_hp_mod ))
+[Hobgoblin]=$(( 80 + e_rank_hp_mod ))
+[Undead Skeleton]=$(( 60 + e_rank_hp_mod ))
+[Shadow]=$(( 50 + e_rank_hp_mod ))
 
 )
 
