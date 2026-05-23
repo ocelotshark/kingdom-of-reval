@@ -277,7 +277,8 @@ quest_board_handler() {
 
     clear
 
-    echo -e "              QUEST BOARD              \n\n"
+    echo -e "              ${BOLD}${UNDERLINE}QUEST BOARD${RESET}\n\n"
+    echo -e "${UNDERLINE}MINOR QUEST${RESET}\n"
     # echo "it's currently ${current_epoch_seconds} quest will reset at ${base_epoch_seconds}"
     # echo -e "q1 tenem=${random_quest_0_data[total_enemies]} : q2 tenem=${random_quest_1_data[total_enemies]} : q3 tenem=${random_quest_2_data[total_enemies]}"
     echo -e "QUEST [1]    RANK:${random_quest_0_data[rank]}\n${random_quest_0_data[type_display]}${UNDERLINE}${random_quest_0_data[theme_display]} ${RESET}\n"

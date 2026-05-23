@@ -13,12 +13,20 @@ story_navigation () {
                 desc_room
             ;;
             "west":"guild_hall_center")
-                echo "bar room"
-            ;;
+                location="fandor_gh_bar"
+                desc_room
+                ;;
+                "east":"fandor_gh_bar")
+                    location="guild_hall_center"
+                    desc_room
+                ;;
+                "north":"fandor_gh_bar")
+                    echo -e "${WARNING}UNDER CONSTRUCTION!!${RESET}"
+                ;;                
             "north":"guild_hall_center")
                 verb="talk"
                 noun="clerk"
-                talk_handle
+                talk_handler
             ;;
 # FANDOR GUILD HALL - OUTSIDE
             "north":"fandor_gh_outside")
@@ -48,7 +56,7 @@ story_navigation () {
                 desc_room
             ;;              
             *)
-                echo "You can't go that way"
+                echo "You cannot go that way"
             ;;
         esac
 

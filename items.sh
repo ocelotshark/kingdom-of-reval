@@ -7,6 +7,21 @@ declare -gA item_type=(
     [necklace_of_mana]="accessory"    
     [apple]="consumable"
     [lever]="object"
+    [goblin_ear]="minor_quest_item"
+    [troll_toenail]="minor_quest_item"
+    [mana_crystal]="minor_quest_item"
+    [bottled_tear]="minor_quest_item"
+    [whispering_shard]="minor_quest_item"
+    [screaming_crystal]="minor_quest_item"
+    [gravemoss]="minor_quest_item"
+    [witchroot]="minor_quest_item"
+    [bloodmint]="minor_quest_item"
+    [ceremonial_spoon]="minor_quest_item"
+    [ancient_scroll]="minor_quest_item"
+    [cracked_idol]="minor_quest_item"
+    [ominous_teaspoon]="minor_quest_item"
+    [insect_molt]="minor_quest_item"
+    [slime_core]="minor_quest_item"
 )
 
 declare -gA weapon_data=(
@@ -46,6 +61,24 @@ declare -gA consumable_data=(
 
 declare -gA object_data=(
     [lever_description]="A sturdy lever, what does it do? Who knows..."
+)
+
+declare -gA minor_quest_item_data=(
+    [goblin_ear_description]="A shriveled goblin ear, still reeking of damp caves."
+    [troll_toenail_description]="A thick troll toenail chipped from some hulking brute."
+    [mana_crystal_description]="A glowing crystal humming softly with raw arcane energy."
+    [bottled_tear_description]="A tiny glass vial holding a single shimmering tear."
+    [whispering_shard_description]="Faint whispers slither from the jagged black shard."
+    [screaming_crystal_description]="A crimson crystal that emits distant muffled screams."
+    [gravemoss_description]="Cold gray moss gathered from ancient burial stones."
+    [witchroot_description]="A twisted root pulsing faintly with unnatural warmth."
+    [bloodmint_description]="Dark red mint leaves carrying a sharp metallic scent."
+    [ceremonial_spoon_description]="An engraved spoon once used in strange sacred rites."
+    [ancient_scroll_description]="A brittle scroll covered in faded forgotten script."
+    [cracked_idol_description]="A fractured idol staring ahead with hollow stone eyes."
+    [ominous_teaspoon_description]="A tarnished teaspoon radiating quiet unsettling dread."
+    [insect_molt_description]="A brittle shell shed by some massive crawling insect."
+    [slime_core_description]="A wobbling core of dense slime pulsing with ooze."
 )
 
 declare -gA taste_data=(

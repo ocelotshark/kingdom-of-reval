@@ -194,6 +194,7 @@ if [[ "${first_load}" == false ]]; then #REGULAR PARSING
 
         *)
             desc_newline
+            [[ "${in_random_dungeon}" == true ]] && echo
             echo "I'm confused on the whole $verb part"
         ;;
 
@@ -269,7 +270,7 @@ chat_parser () {
 #-------------------------
     case $verb in
 
-        *bye*|goodbye)
+        *bye*|goodbye|gb)
         #hehe ignore this bandaid underneath please
         [[ "${char_creation_done}" == true ]] && char_creation_done="finished" && [[ "${location}" == "room_tutorial_end" ]] && location="guild_hall_center" 
         who=""

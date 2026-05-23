@@ -70,6 +70,7 @@ base_rank="F"
 player_skills=("Cleave" "Shadow Step")
 player_spells=("Fireball" "Magic Missile")
 player_uffs=()
+declare -gA has_material=()
 declare -gA enemy_kills=()
 
 in_random_dungeon=false
@@ -154,6 +155,8 @@ while true; do
 
     read -r -p "SELECT AN ACTION: " action
     action="${action,,}"
+    [[ "${action}" == "r" ]] && [[ ! -z last_action ]] && action="${last_action}"
+    last_action="${action}"
     combat_handler
     clear
 

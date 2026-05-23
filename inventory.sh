@@ -28,6 +28,7 @@ view_inventory() {
         for key in "${!player_inventory[@]}"; do
         local value="${player_inventory[$key]}"
         local display_key="${key//_/ }"
+        display_key="${display_key,,}"
         display_key="${display_key^}"
         printf '%b  ' "${ITALIC}${display_key} x $value${RESET}"
 

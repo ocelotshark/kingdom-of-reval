@@ -334,6 +334,26 @@ fi
 #FILL RANDO DUNGEON WITH ROOM DESCRIPTIONS AND STUFF
 #-------------------------
 
+scatter_materials() {
+    local loop_bag="${in_progress_random_dungeon[material_amount]}"
+    local scatter
+    local room_idx
+    local sel_room
+
+    while (( loop_bag > 0 )); do
+        room_idx=$(( RANDOM % ${#rooms[@]} ))
+        sel_room=${rooms[$room_idx]}
+
+        scatter=$(( RANDOM % loop_bag + 1 ))
+
+        (( has_material[$sel_room] += scatter ))
+        (( loop_bag -= scatter ))
+    done
+}
+
+scatter_rescue(){
+:
+}
 shuffle_array() {
     local array_name="$1"
     declare -n arr="$array_name"
@@ -386,6 +406,7 @@ rand_theme_and_fill() {
 
     EXIT_IDX=$(( RANDOM % "${#rooms[@]}" ))
     EXIT="${rooms[$EXIT_IDX]}"
+    scatter_materials
 }
 #-------------------------
 #EXEC

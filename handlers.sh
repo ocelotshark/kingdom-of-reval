@@ -6,14 +6,24 @@ f_min_damage=1
 e_max_damage=20
 e_min_damage=4
 
+check_for_material() {
+    quest_object_here=false
+if (( has_material[$location] > 0 ));then
+    echo "You find ${has_material[$location]} ${in_progress_random_dungeon[material],,}s here"
+    quest_object_here=true
+else
+    quest_object_here=false
+fi
+}
+
 #-------------------------
 #DESCRIBE ROOM
 #-------------------------
 
 desc_room() {
     [[ ${in_random_dungeon} == false ]] && echo -e "${room_desc[$location]}"
-    [[ ${in_random_dungeon} == true ]] && theme_banner="${banner_title//_/ }" && theme_banner="${theme_banner^^}" && echo -e "\e[7m${theme_banner}\e[0m\n"
-    [[ ${in_random_dungeon} == true ]] && echo "${random_dungeon_properties["$location,description"]}"
+    [[ ${in_random_dungeon} == true ]] && theme_banner="${banner_title//_/ }" && theme_banner="${theme_banner^^}" && echo -e "\e[7m${theme_banner}\e[0m\n" && 
+    [[ ${in_random_dungeon} == true ]] && echo "${random_dungeon_properties["$location,description"]}" && check_for_material
  
     if [[ ${in_random_dungeon} == true ]]; then
         random_dungeon_spawner
@@ -77,6 +87,7 @@ return_check(){
     if [[ ${flee_success} = true ]]; then
         desc_room
         flee_success=false
+        show_active_quest
     fi
 }
 
@@ -252,7 +263,7 @@ valid=false
                         break
                     fi
                 done
-                [[ $valid = false ]] && echo "You can't go that way"
+                [[ $valid = false ]] && echo "You can't go that way" && echo
 }
 
 rdung_nav_checker_south() {
@@ -268,7 +279,7 @@ valid=false
                         break       
                     fi
                 done
-                [[ $valid = false ]] && echo "You can't go that way"
+                [[ $valid = false ]] && echo "You can't go that way" && echo
 }
 
 rdung_nav_checker_west() {
@@ -284,7 +295,7 @@ valid=false
                         break       
                     fi
                 done
-                [[ $valid = false ]] && echo "You can't go that way"
+                [[ $valid = false ]] && echo "You can't go that way" && echo
 }
 
 rdung_nav_checker_east() {
@@ -300,7 +311,7 @@ valid=false
                         break
                     fi
                 done
-                [[ $valid = false ]] && echo "You can't go that way"
+                [[ $valid = false ]] && echo "You can't go that way" && echo
 }
 
 #-------------------------
@@ -386,21 +397,26 @@ go_handler() {
             
             "north")
                 rdung_nav_checker_north
-                desc_room                                
+                desc_room
+                reverse_direction="south"
             ;;
 
             "south")
                 rdung_nav_checker_south
                 desc_room                
+                reverse_direction="north"
+
             ;;
             "west")
                 rdung_nav_checker_west
                 desc_room               
+                reverse_direction="east"
             ;;
 
             "east")
                 rdung_nav_checker_east
                 desc_room                
+                reverse_direction="west"
             ;;
 
             "exit")
@@ -408,11 +424,14 @@ go_handler() {
             ;;
 
             *)
-                echo "You can't go that way"
+                reverse_direction="blocked"
             ;;
         esac
         
-        quest_completed_text 
+        if [[ ${reverse_direction} != "blocked" ]];then 
+            echo -e "\n${DIM}- You came from the $reverse_direction${RESET}"
+        fi
+        quest_completed_text
         [[ ${draw_dungeon} == true ]] && echo && draw_dungeon
     fi
 
@@ -425,8 +444,7 @@ go_handler() {
 #-------------------------
 show_active_quest() {
         if [[ "${in_random_dungeon}" == true ]] && [[ "${in_progress_random_dungeon[state]}" == true ]];then
-            echo
-            echo
+            echo ; echo
             echo -e "Active Quest: RANK:${in_progress_random_dungeon[rank]}\n${in_progress_random_dungeon[type_display]}${UNDERLINE}${in_progress_random_dungeon[theme_display]} ${RESET}\n"
         fi
 }
@@ -530,7 +548,7 @@ look_handler() {
         "south":"guild_hall_center")
             echo "${object_look[fandor_gh_door]}"
         ;;
-        *door*:"guild_hall_center")
+        *door*:"guild_hall_center"|*door*:"fandor_gh_outside")
             echo "${object_look[fandor_gh_door]}"
         ;;
         "west":"guild_hall_center")
@@ -576,8 +594,25 @@ nothing_to_take(){
 
 take_handler() {
 
-    case $noun in
+    local rand_quest_item="${in_progress_random_dungeon[material],,}"
+    rand_quest_item="${rand_quest_item//_/ }"
+    # read -ra rand_quest_keywords <<< "$rand_quest_item"
 
+    case $noun in
+        "${rand_quest_item}"|"${rand_quest_item}"s)
+            desc_newline
+            echo
+            if [[ "${quest_object_here}" == true ]]; then
+                for ((i=0;i<${has_material[$location]};i++)); do
+                    add_item_handler "${in_progress_random_dungeon[material]}"
+                done
+            (( in_progress_random_dungeon[material_collected] += has_material[$location] ))
+            has_material[$location]=0
+            clear
+            update_room_after_take
+            fi
+            return
+        ;;       
         *)
             if [[ -z "${noun}" ]]; then #if player just types take
                 desc_room
@@ -842,6 +877,7 @@ chat_handler() {
             *reg*) verb="reg" ;;
             "register") verb="reg" ;;
             "registration") verb="reg" ;;
+
         esac
 
         case $verb:$who in
@@ -886,6 +922,7 @@ case $verb in
 "turn") verb="collect";;
 "finished") verb="collect";;
 "complete") verb="collect";;
+"gb") verb="goodbye" ;;
 esac
 
 case $verb:$who in
@@ -901,8 +938,8 @@ case $verb:$who in
             xp_reward="${combat_rank_lower_cased}_rank_quest_xp"
             
             echo
-            echo -e "A pouch containing ${quest_rewards[$gold_reward]} gold coins."
-            echo -e "You feel more experienced. ${quest_rewards[$xp_reward]} experience gained."
+            echo -e "A pouch containing ${YELLOW}${quest_rewards[$gold_reward]} gold coins.${RESET}"
+            echo -e "You feel more experienced. ${MAGENTA}${quest_rewards[$xp_reward]} experience gained.${RESET}"
 
             (( player_gold += quest_rewards[$gold_reward] ))
             (( player_xp += quest_rewards[$xp_reward] ))
@@ -946,6 +983,10 @@ esac
 completed_quest_checker(){
     if [[ "${in_progress_random_dungeon[type]}" == "CLEAR ALL MONSTERS" ]];then
         if (( "${in_progress_random_dungeon[enemies_killed]}" >= "${in_progress_random_dungeon[total_enemies]}" ));then
+            in_progress_random_dungeon[state]="complete"
+        fi    
+    elif [[ "${in_progress_random_dungeon[type]}" == "COLLECT" ]];then
+        if (( "${in_progress_random_dungeon[material_collected]}" >= "${in_progress_random_dungeon[material_amount]}" ));then
             in_progress_random_dungeon[state]="complete"
         fi
     fi
