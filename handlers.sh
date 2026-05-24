@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+mapfile -t rescue_activities < rescue_npc_activities.txt
+
 #enemy attack damage based on rank
 f_max_damage=10
 f_min_damage=1
@@ -7,12 +9,34 @@ e_max_damage=20
 e_min_damage=4
 
 check_for_material() {
+if [[ "${in_progress_random_dungeon[type]}" == "COLLECT" ]];then 
     quest_object_here=false
-if (( has_material[$location] > 0 ));then
-    echo "You find ${has_material[$location]} ${in_progress_random_dungeon[material],,}s here"
-    quest_object_here=true
-else
+    if (( has_material[$location] > 0 ));then
+        echo "You find ${has_material[$location]} ${in_progress_random_dungeon[material],,}s here"
+        quest_object_here=true
+    else
+        quest_object_here=false
+    fi
+fi
+}
+
+check_for_rescue() {
+if [[ "${in_progress_random_dungeon[type]}" == "RESCUE" ]];then 
     quest_object_here=false
+    if [[ "${in_progress_random_dungeon[rescue_location]}" == "${location}" ]];then
+        local activity_idx=$(( RANDOM % "${#rescue_activities[@]}" ))
+        local activity="${rescue_activities[$activity_idx]}"
+        local display_name="${in_progress_random_dungeon[rescue_name],,}"
+        local display_name_fix=""
+        for word in $display_name;do
+            display_name_fix+="${word^} "
+        done
+        display_name="${display_name_fix% }"
+        echo "${display_name} ${activity}"
+        quest_object_here=true
+    else
+        quest_object_here=false
+    fi
 fi
 }
 
@@ -23,7 +47,7 @@ fi
 desc_room() {
     [[ ${in_random_dungeon} == false ]] && echo -e "${room_desc[$location]}"
     [[ ${in_random_dungeon} == true ]] && theme_banner="${banner_title//_/ }" && theme_banner="${theme_banner^^}" && echo -e "\e[7m${theme_banner}\e[0m\n" && 
-    [[ ${in_random_dungeon} == true ]] && echo "${random_dungeon_properties["$location,description"]}" && check_for_material
+    [[ ${in_random_dungeon} == true ]] && echo "${random_dungeon_properties["$location,description"]}" && check_for_material && check_for_rescue && completed_quest_checker
  
     if [[ ${in_random_dungeon} == true ]]; then
         random_dungeon_spawner
@@ -86,6 +110,12 @@ return_check(){
 
     if [[ ${flee_success} = true ]]; then
         desc_room
+        if [[ "${in_random_dungeon}" == true ]];then 
+            if [[ ${reverse_direction} != "blocked" ]];then 
+                echo -e "\n${DIM}- You came from the $reverse_direction${RESET}"
+            fi
+        fi
+        completed_quest_checker
         flee_success=false
         show_active_quest
     fi
@@ -213,7 +243,8 @@ exit_dungeon_handler(){
                         case $confirm_leave in
                             y|yes)
                                 in_progress_random_dungeon=()
-                                in_progress_random_dungeon[state]=false 
+                                in_progress_random_dungeon[state]=false
+                                reverse_direction=""
                                 in_random_dungeon=false
                                 combat_rank="${base_rank}"
                                 state="nav"
@@ -233,6 +264,7 @@ exit_dungeon_handler(){
                         in_random_dungeon=false
                         state="nav"
                         location="${prev_nav_location}"
+                        reverse_direction=""
                         desc_newline
                     fi
                 else
@@ -597,6 +629,7 @@ take_handler() {
     local rand_quest_item="${in_progress_random_dungeon[material],,}"
     rand_quest_item="${rand_quest_item//_/ }"
     # read -ra rand_quest_keywords <<< "$rand_quest_item"
+    local rand_rescue_person="${in_progress_random_dungeon[rescue_name],,}"
 
     case $noun in
         "${rand_quest_item}"|"${rand_quest_item}"s)
@@ -604,7 +637,7 @@ take_handler() {
             echo
             if [[ "${quest_object_here}" == true ]]; then
                 for ((i=0;i<${has_material[$location]};i++)); do
-                    add_item_handler "${in_progress_random_dungeon[material]}"
+                    add_item_handler "${in_progress_random_dungeon[material],,}"
                 done
             (( in_progress_random_dungeon[material_collected] += has_material[$location] ))
             has_material[$location]=0
@@ -612,7 +645,19 @@ take_handler() {
             update_room_after_take
             fi
             return
-        ;;       
+        ;;
+        "${rand_rescue_person}")
+            desc_newline
+            echo
+            if [[ "${quest_object_here}" == true ]]; then
+                add_item_handler "${in_progress_random_dungeon[rescue_name],,}"
+                in_progress_random_dungeon[rescue_location]=""
+                in_progress_random_dungeon[rescue_state]=true
+                clear
+                update_room_after_take
+            fi
+            return
+        ;;         
         *)
             if [[ -z "${noun}" ]]; then #if player just types take
                 desc_room
@@ -943,9 +988,16 @@ case $verb:$who in
 
             (( player_gold += quest_rewards[$gold_reward] ))
             (( player_xp += quest_rewards[$xp_reward] ))
-
+            for item in "${!player_inventory[@]}";do
+                local type="${item_type[$item]}"
+                [[ "${type}" == "minor_quest_item" ]] && unset "player_inventory[$item]"
+            done
+            local rescue_person="${in_progress_random_dungeon[rescue_name],,}"
+            rescue_person="${rescue_person// /_}"
+            [[ "${in_progress_random_dungeon[type]}" == "RESCUE" ]] && unset "item_type[$rescue_person]" && unset "minor_quest_item_data[${rescue_person}_description]" 
             in_progress_random_dungeon=()
             in_progress_random_dungeon[state]=false
+
 
         else
             echo -e "${fandor_guild[clerk_collect_failure_neutral]}"
@@ -981,15 +1033,37 @@ esac
 #IS ENEMY DEAD HANDLERS
 #-------------------------
 completed_quest_checker(){
-    if [[ "${in_progress_random_dungeon[type]}" == "CLEAR ALL MONSTERS" ]];then
+    case "${in_progress_random_dungeon[type]}" in
+    "CLEAR ALL MONSTERS")
         if (( "${in_progress_random_dungeon[enemies_killed]}" >= "${in_progress_random_dungeon[total_enemies]}" ));then
             in_progress_random_dungeon[state]="complete"
-        fi    
-    elif [[ "${in_progress_random_dungeon[type]}" == "COLLECT" ]];then
+        fi
+    ;;
+    "COLLECT")
         if (( "${in_progress_random_dungeon[material_collected]}" >= "${in_progress_random_dungeon[material_amount]}" ));then
             in_progress_random_dungeon[state]="complete"
         fi
-    fi
+    ;;
+    "RESCUE")
+        if [[ "${in_progress_random_dungeon[rescue_state]}" == true ]];then
+            in_progress_random_dungeon[state]="complete"
+        fi
+    ;;
+    esac
+
+    # if [[ "${in_progress_random_dungeon[type]}" == "CLEAR ALL MONSTERS" ]];then
+    #     if (( "${in_progress_random_dungeon[enemies_killed]}" >= "${in_progress_random_dungeon[total_enemies]}" ));then
+    #         in_progress_random_dungeon[state]="complete"
+    #     fi    
+    # if [[ "${in_progress_random_dungeon[type]}" == "COLLECT" ]];then
+    #     if (( "${in_progress_random_dungeon[material_collected]}" >= "${in_progress_random_dungeon[material_amount]}" ));then
+    #         in_progress_random_dungeon[state]="complete"
+    #     fi
+    # else
+    #     if [[ "${in_progress_random_dungeon[rescue_state]}" == true ]];then
+    #         in_progress_random_dungeon[state]="complete"
+    #     fi
+    # fi
 }
 quest_completed_text(){
     if [[ "${in_progress_random_dungeon[state]}" == "complete" ]];then

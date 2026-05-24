@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+mapfile -t rescue_desc_array < rescue_npc_desc.txt
 e_spawn_chance=5
 f_spawn_chance=5
 max_enemies=100
@@ -352,7 +353,16 @@ scatter_materials() {
 }
 
 scatter_rescue(){
-:
+    local rescue_person="${in_progress_random_dungeon[rescue_name]}"
+    rescue_person="${rescue_person// /_}"
+    rescue_person="${rescue_person,,}"
+    local room_idx=$(( RANDOM % ${#rooms[@]} ))
+    local sel_room=${rooms[$room_idx]}
+    in_progress_random_dungeon[rescue_location]="${sel_room}"
+    item_type[$rescue_person]="minor_quest_item"
+    local rescue_desc_idx=$(( RANDOM % ${#rescue_desc_array[@]} ))
+    local rescue_desc="${rescue_desc_array[$rescue_desc_idx]}"
+    minor_quest_item_data["${rescue_person}_description"]="${rescue_desc}"
 }
 shuffle_array() {
     local array_name="$1"
@@ -406,7 +416,10 @@ rand_theme_and_fill() {
 
     EXIT_IDX=$(( RANDOM % "${#rooms[@]}" ))
     EXIT="${rooms[$EXIT_IDX]}"
+    in_progress_random_dungeon[material_collected]=0
+    in_progress_random_dungeon[enemies_killed]=0
     scatter_materials
+    scatter_rescue
 }
 #-------------------------
 #EXEC

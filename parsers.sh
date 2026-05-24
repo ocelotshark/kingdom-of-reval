@@ -188,6 +188,18 @@ if [[ "${first_load}" == false ]]; then #REGULAR PARSING
                 echo "Showing active quest off"
             fi 
         ;;
+
+        sda)
+        for key in ${!player_inventory[@]};do 
+        echo "$key ${player_inventory[$key]}"
+        done
+        for key in ${!item_type[@]};do 
+        echo "$key ${item_type[$key]}"
+        done
+        for key in ${!minor_quest_item_data[@]};do 
+        echo "$key ${minor_quest_item_dat[$key]}"
+        done
+        ;;
         "exit")
             exit_dungeon_handler
         ;;        
