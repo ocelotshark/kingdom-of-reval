@@ -132,6 +132,22 @@ If you've finished something, collect your reward and move along.\"${RESET}"
 She reaches beneath the counter and returns with your payment.
 \"Keep them coming.\" The clerk hands you:"
 
+[clerk_collect_success_rescue]="The clerk scans over the rescue report, then glances up at the
+exhausted survivor beside you.
+
+\"Still breathing. That's better than most.\" She scribbles a few
+notes onto the parchment before reaching beneath the counter.
+
+\"Good work out there.\" The clerk hands you:"
+
+[clerk_collect_success_materials]="The clerk inspects the bundled materials one by one, carefully
+counting each piece before giving a satisfied nod.
+
+\"Everything's here. Nicely done.\" She pulls a reward pouch from
+beneath the counter and slides it toward you.
+
+\"The guild will make good use of these.\" The clerk hands you:"
+
 [clerk_collect_failure_neutral]="The clerk glances over your records before sliding them back.
 \"Nothing completed.\"
 

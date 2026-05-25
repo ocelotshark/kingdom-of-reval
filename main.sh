@@ -21,6 +21,7 @@ source quest_board.sh
 source dumb_functions.sh
 source death_screen.sh
 source quest_rewards.sh
+source vendors.sh
 clear
 wait
 
@@ -32,7 +33,7 @@ name=""
 player_rank="bronze"
 class=""
 race=""
-player_gold=0
+player_gold=50
 
 location="room_start"
 location_tmp="$location"
@@ -85,6 +86,8 @@ prev_state="nav"
 bonus_health=0
 screen_flashing=true
 in_progress_random_dungeon[state]=false
+vendor="fandor_recruit_market"
+buying=true
 
 for arg in "$@"; do 
   case "$arg" in
@@ -101,6 +104,10 @@ for arg in "$@"; do
       player_health=9999
       player_mana=9999
       player_skill_points=9999
+      ;;
+    -shop)
+     state="shopping"
+      ;;
   esac
 done
 
@@ -179,5 +186,14 @@ while [[ "${state}" == "using_quest_board" ]]; do
 quest_board_handler
 
 done
+
+#-------------------------
+#SHOPPING SCREEN STATE
+#-------------------------
+
+while [[ "${state}" == "shopping" ]]; do
+    shopping_parser
+done
+
 
 done

@@ -624,6 +624,22 @@ nothing_to_take(){
     echo -e "${ITALIC}You don't see any $noun around here${RESET}"
 }
 
+rescue_handler(){
+    if [[ "${in_progress_random_dungeon[type]}" == "RESCUE" ]];then
+        if [[ "${quest_object_here}" == true ]]; then
+            local rand_rescue_person="${in_progress_random_dungeon[rescue_name],,}"
+            noun="${rand_rescue_person}"
+            verb="take"
+            take_handler
+        else
+            desc_newline
+            echo "${in_progress_random_dungeon[rescue_name],,} isn't here!"
+        fi
+    else
+        desc_newline
+        echo "You need to be on a quest to rescue someone!"
+    fi
+}
 take_handler() {
 
     local rand_quest_item="${in_progress_random_dungeon[material],,}"
@@ -899,6 +915,52 @@ talk_handler() {
         esac
     fi     
 }
+#-------------------------
+#COLLECT HANDLER
+#-------------------------
+    collect_handler(){
+        if [[ "${in_progress_random_dungeon[state]}" == "complete" ]];then
+
+            case "${in_progress_random_dungeon[type]}" in
+            "CLEAR ALL MONSTERS")
+                echo -e "${fandor_guild[clerk_collect_success_neutral]}"
+            ;;
+            "COLLECT")
+                echo -e "${fandor_guild[clerk_collect_success_materials]}"
+            ;;
+            "RESCUE")
+                echo -e "${fandor_guild[clerk_collect_success_rescue]}"
+            ;;
+            esac
+
+            combat_rank_lower_cased="${in_progress_random_dungeon[rank],,}"
+
+            gold_reward="${combat_rank_lower_cased}_rank_quest_gold"
+            xp_reward="${combat_rank_lower_cased}_rank_quest_xp"
+            
+            echo
+            echo -e "A pouch containing ${YELLOW}${quest_rewards[$gold_reward]} gold coins.${RESET}"
+            echo -e "You feel more experienced. ${MAGENTA}${quest_rewards[$xp_reward]} experience gained.${RESET}"
+
+            (( player_gold += quest_rewards[$gold_reward] ))
+            (( player_xp += quest_rewards[$xp_reward] ))
+
+            # clean up {------------------
+            for item in "${!player_inventory[@]}";do
+                local type="${item_type[$item]}"
+                [[ "${type}" == "minor_quest_item" ]] && unset "player_inventory[$item]"
+            done
+            local rescue_person="${in_progress_random_dungeon[rescue_name],,}"
+            rescue_person="${rescue_person// /_}"
+            [[ "${in_progress_random_dungeon[type]}" == "RESCUE" ]] && unset "item_type[$rescue_person]" && unset "minor_quest_item_data[${rescue_person}_description]" 
+            in_progress_random_dungeon=()
+            in_progress_random_dungeon[state]=false
+            # -----------------}
+
+        else
+            echo -e "${fandor_guild[clerk_collect_failure_neutral]}"
+        fi
+    }
 
 #-------------------------
 #CHAT HANDLER
@@ -974,35 +1036,7 @@ case $verb:$who in
 
 
     *collect*:"clerk")
-        if [[ "${in_progress_random_dungeon[state]}" == "complete" ]];then
-            echo -e "${fandor_guild[clerk_collect_success_neutral]}"
-
-            combat_rank_lower_cased="${in_progress_random_dungeon[rank],,}"
-
-            gold_reward="${combat_rank_lower_cased}_rank_quest_gold"
-            xp_reward="${combat_rank_lower_cased}_rank_quest_xp"
-            
-            echo
-            echo -e "A pouch containing ${YELLOW}${quest_rewards[$gold_reward]} gold coins.${RESET}"
-            echo -e "You feel more experienced. ${MAGENTA}${quest_rewards[$xp_reward]} experience gained.${RESET}"
-
-            (( player_gold += quest_rewards[$gold_reward] ))
-            (( player_xp += quest_rewards[$xp_reward] ))
-            for item in "${!player_inventory[@]}";do
-                local type="${item_type[$item]}"
-                [[ "${type}" == "minor_quest_item" ]] && unset "player_inventory[$item]"
-            done
-            local rescue_person="${in_progress_random_dungeon[rescue_name],,}"
-            rescue_person="${rescue_person// /_}"
-            [[ "${in_progress_random_dungeon[type]}" == "RESCUE" ]] && unset "item_type[$rescue_person]" && unset "minor_quest_item_data[${rescue_person}_description]" 
-            in_progress_random_dungeon=()
-            in_progress_random_dungeon[state]=false
-
-
-        else
-            echo -e "${fandor_guild[clerk_collect_failure_neutral]}"
-        fi
-
+    collect_handler
     ;;
 
     *:"clerk")

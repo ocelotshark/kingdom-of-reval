@@ -23,7 +23,13 @@ declare -gA item_type=(
     [insect_molt]="minor_quest_item"
     [slime_core]="minor_quest_item"
 )
-
+declare -gA item_value=(
+    [short_sword_value]=10
+    [cloth_tunic_value]=2
+    [necklace_of_life_value]=50
+    [necklace_of_mana_value]=50
+    [apple_value]=3      
+)
 declare -gA weapon_data=(
     [short_sword_damage]=5
     [short_sword_description]="The blade is roughly forged but will get the job done."
