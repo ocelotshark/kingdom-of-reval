@@ -34,11 +34,11 @@ declare -gA item_value=(
     [necklace_of_life_value]=50
     [necklace_of_mana_value]=50
     [apple_value]=3
-    [stale_bread]=3
-    [ale]=2
-    [minor_health_potion]=15
-    [minor_mana_potion]=15
-    [ironwill_stout]=40       
+    [stale_bread_value]=3
+    [ale_value]=2
+    [minor_health_potion_value]=15
+    [minor_mana_potion_value]=15
+    [ironwill_stout_value]=40
 )
 declare -gA weapon_data=(
     [short_sword_damage]=5

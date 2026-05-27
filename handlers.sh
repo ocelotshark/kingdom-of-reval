@@ -1064,6 +1064,30 @@ case $verb in
 "finished") verb="collect";;
 "complete") verb="collect";;
 "gb") verb="goodbye" ;;
+"purchase") verb="buy";;
+"shop") verb="buy";;
+"store") verb="buy";;
+"wares") verb="buy";;
+"goods") verb="buy";;
+"browse") verb="buy";;
+"trade") verb="buy";;
+"barter") verb="buy";;
+"merchant") verb="buy";;
+"supplies") verb="buy";;
+"equipment") verb="buy";;
+"stock") verb="buy";;
+"inventory") verb="buy";;
+"purchase") verb="buy";;
+"buying") verb="buy";;
+"see") verb="buy";;
+"show") verb="buy";;
+"look") verb="buy";;
+"items") verb="buy";;
+"drink") verb="buy";;
+"ale") verb="buy";;
+"brew") verb="buy";;
+"stout") verb="buy";;
+
 esac
 
 case $verb:$who in
@@ -1091,8 +1115,11 @@ case $verb:$who in
 
     "information":"durgin"|"info":"durgin")
         echo -e "${fandor_guild[bartender_info_$(( RANDOM % 10 ))]}"
-    ;;    
+    ;;
 
+    *:"durgin")
+        echo -e "${fandor_guild[bartender_default]}"
+    ;;
 
     *)
         if [[ -n "${noun}" ]]; then #if its an unknown noun

@@ -49,7 +49,7 @@ declare -gA fandor_guild=(
 She looks up at you, but you feel like she is looking through you as 
 if you are invisible.
 
-Registration, collection, or just here to bother me?
+${BLINK}Registration${RESET}, ${BLINK}collection${RESET}, or just here to ${BLINK}bother${RESET} me?
 "
 
 [clerk_collection]="I only deal with registered adventurers."
@@ -65,16 +65,16 @@ She finally glances up at you—tired, unimpressed.
 \"Go on. What are you?\"
 
 
-${BOLD}W)arrior${RESET} — Front line. Steel, muscle, and bad decisions. 
+${BnR}W)arrior${RESET} — Front line. Steel, muscle, and bad decisions. 
 You’ll hit harder the more experienced you get.
 
-${BOLD}C)leric${RESET} — Keep people alive. Or try to. 
+${BnR}C)leric${RESET} — Keep people alive. Or try to. 
 More durable than you look, if you stick with it.
 
-${BOLD}M)age${RESET} — Books, spells, and things catching fire. 
+${BnR}M)age${RESET} — Books, spells, and things catching fire. 
 Your mana pool will grow fast.
 
-${BOLD}P)aladin${RESET} — Bit of everything. Discipline, control… 
+${BnR}P)aladin${RESET} — Bit of everything. Discipline, control… 
 and a tendency to think you’re right.
 
 
@@ -90,19 +90,19 @@ ${DIM}Race won't have any effect on gameplay
 but could lead to some different social interactions.${RESET}
 
 
-${BOLD}H)uman${RESET} — \"Reliable. Adaptable. Everywhere. 
+${BnR}H)uman${RESET} — \"Reliable. Adaptable. Everywhere. 
 You’ll fit in just fine.\"
 
-${BOLD}E)lf${RESET} — \"Graceful, long-lived… and usually aware of it. 
+${BnR}E)lf${RESET} — \"Graceful, long-lived… and usually aware of it. 
 Try not to look down on everyone.\"
 
-${BOLD}D)warf${RESET} — \"Stubborn, tough, and loud about both. 
+${BnR}D)warf${RESET} — \"Stubborn, tough, and loud about both. 
 At least you’ll survive.\"
 
-${BOLD}O)rc${RESET} — \"Strong. Direct. People will assume things. 
+${BnR}O)rc${RESET} — \"Strong. Direct. People will assume things. 
 They’re not always wrong.\"
 
-${BOLD}Hf)Halfling${RESET} — \"Small, quiet, and underestimated. 
+${BnR}Hf)Halfling${RESET} — \"Small, quiet, and underestimated. 
 Probably the smartest way to stay alive, honestly.\"
 
 
@@ -119,8 +119,8 @@ She looks up for a moment, studying you.
 \"Try to keep yourself alive. We lose enough people as it is.\"
 A small pause. \"Good luck out there.\"
 
-${DIM}${BLINK}TUTORIAL: Type 'goodbye' to finish interacting with someone.${RESET}
-"
+${DIM}${BLINK}TUTORIAL: While chatting it's best to just input a single keyword.
+Type 'goodbye' to finish interacting with someone.${RESET}"
 #01clerk chatting
 
 [clerk_default_1]="The clerk barely looks up from the papers scattered across the counter.

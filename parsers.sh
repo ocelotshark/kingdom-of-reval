@@ -316,7 +316,7 @@ shopping_parser(){
             printf "%-20s %5s\n" "${display_key^}" "${current_vendor[$key]}"
         done
 
-        echo -e "${UNDERLINE}                      ${RESET}\n"
+        echo -e "${UNDERLINE}                         ${RESET}\n"
         echo "P)urchase"
         echo "S)ell Menu"
         echo "H)elp"        

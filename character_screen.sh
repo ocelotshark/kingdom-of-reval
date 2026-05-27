@@ -158,12 +158,13 @@ printf " Active Effects: "
 echo
 echo
 echo " Stat Points Unallocated: $lvl_points"
+echo -e " ${UNDERLINE}                          ${RESET}"
 echo
-echo " Allocate Points to: "
+echo -e " Allocate Points to: "
 echo " D)etermination"
 echo " S)trength"
 echo " I)ntelligence"
-echo
+echo -e " ${UNDERLINE}                          ${RESET}"
 echo " B)ack"
 echo
 echo -e "${REVERSE} XP TO LVL $next_level - $player_xp/$xp_to_next_lvl ${RESET}"
