@@ -58,7 +58,7 @@ max_mana=$(( base_max_mana + intelligence_modifi + mage_modifi + bonus_mana ))
 max_health=$(( base_max_health + health_modifi + cleric_modifi + bonus_health ))
 weapon_damage_pull
 player_attack=$(( base_attack + strength_modifi + warrior_modifi + weapon_damage))
-max_skill_points=$(( determination_modifi + paladin_modifi ))
+max_skill_points=$(( base_skill_points + determination_modifi + paladin_modifi ))
 armor_defense_pull
 player_defense=$(( base_defense + armor_defense ))
 }

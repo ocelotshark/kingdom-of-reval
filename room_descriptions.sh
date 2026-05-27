@@ -117,6 +117,8 @@ Where torchlight meets smoke and the smell of spilled ale never quite leaves the
 Scarred mugs, loud laughter, and half-finished stories crowd every inch of it.
 More rumors, contracts, and bad decisions have started here than anyone cares to admit.
 
+The bartender is busy cleaning the bar which stretches from wall to wall.
+
 To the ${BLUE}north${RESET} is a board that reads: \"Trophy Kills\". Back to the
 ${BLUE}east${RESET} is the center of the guild hall."
 

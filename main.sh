@@ -60,7 +60,8 @@ base_attack=1
 player_attack=0
 base_defense=0
 player_skill_points=0
-max_skill_points=0
+base_skill_points=1
+max_skill_points=1
 
 player_reputation=50
 

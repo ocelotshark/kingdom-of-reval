@@ -209,6 +209,29 @@ recover_health() {
     (( player_health + health_add > max_health )) && player_health=$max_health
 }
 
+recover_skill_points() {
+    local skill_add=$1
+    local confirm
+
+    if (( player_skill_points + skill_add > max_skill_points ));then
+        desc_newline
+        echo "Part or all of this item's restorative effects may be wasted."
+        read -r -p "Are you sure you want to use it? (Y)es or (N)o: " confirm
+        confirm="${confirm,,}"
+            case $confirm in
+                y|yes)
+                    player_skill_points=$max_skill_points
+                ;;
+                n|no)
+                    return 2
+                ;;
+            esac
+    else
+        (( player_skill_points += skill_add ))
+    fi
+             
+}
+
 #-------------------------
 #DEFEND
 #-------------------------
@@ -888,6 +911,12 @@ talk_handler() {
         esac      
     fi
     if [[ "${char_creation_done}" == "finished" ]]; then
+
+        case $noun in
+        barkeep) noun="bartender" ;;
+        durgin) noun="bartender" ;;
+        esac
+
         case $noun:$location in
 
         "clerk":"guild_hall_center")
@@ -898,6 +927,17 @@ talk_handler() {
             waiting_chat
             wait
             echo -e "${fandor_guild[clerk_default_2]}"
+        ;;
+
+        "bartender":"fandor_gh_bar")
+            who="durgin"
+            state="chat"
+            if (( chat_states[fandor_bartender] == 0 ));then
+                echo -e "${fandor_guild[bartender_firstmeeting]}"
+                chat_states[fandor_bartender]=1
+            else
+                echo -e "${fandor_guild[bartender_default]}"
+            fi
         ;;
 
         "dummy":"fandor_gh_outside")
@@ -988,30 +1028,24 @@ chat_handler() {
         esac
 
         case $verb:$who in
-
-
-            "yes":"clerk")
+           "yes":"clerk")
                 echo -e "Of course you are. \nShe hands you a document, dips a quill in ink and hands it you."
                 character_creation_handler
             ;;
-
             "reg"*:"clerk")
                 echo "She hands you a document, dips a quill in ink and hands it you."
                 character_creation_handler
             ;;
-
             "collect"*:"clerk")
                 echo -e "${fandor_guild[clerk_collection]}"
                 echo "She hands you a document, dips a quill in ink and hands it you."
                 character_creation_handler           
             ;;
-
             *:"clerk")
             echo "You're not from around here are you?"
             echo
             echo -e "${fandor_guild[clerk_introduction]}"
             ;;
-
 
             *)
                 if [[ -n "${noun}" ]]; then #if its an unknown noun
@@ -1048,6 +1082,16 @@ case $verb:$who in
     *:"dummy")
     dummy_chat
     ;;
+
+    "buy":durgin)
+        prev_location="${location}"
+        vendor="fandor_bartender"
+        state="shopping"
+    ;;
+
+    "information":"durgin"|"info":"durgin")
+        echo -e "${fandor_guild[bartender_info_$(( RANDOM % 10 ))]}"
+    ;;    
 
 
     *)

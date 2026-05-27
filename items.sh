@@ -6,6 +6,11 @@ declare -gA item_type=(
     [necklace_of_life]="accessory"
     [necklace_of_mana]="accessory"    
     [apple]="consumable"
+    [stale_bread]="consumable"
+    [ale]="consumable"
+    [minor_health_potion]="consumable"
+    [minor_mana_potion]="consumable"
+    [ironwill_stout]="consumable"
     [lever]="object"
     [goblin_ear]="minor_quest_item"
     [troll_toenail]="minor_quest_item"
@@ -28,7 +33,12 @@ declare -gA item_value=(
     [cloth_tunic_value]=2
     [necklace_of_life_value]=50
     [necklace_of_mana_value]=50
-    [apple_value]=3      
+    [apple_value]=3
+    [stale_bread]=3
+    [ale]=2
+    [minor_health_potion]=15
+    [minor_mana_potion]=15
+    [ironwill_stout]=40       
 )
 declare -gA weapon_data=(
     [short_sword_damage]=5
@@ -62,7 +72,32 @@ declare -gA consumable_data=(
     [apple_modify_variable]="player_health"
     [apple_modify_value]=5
     [apple_description]="Fruit with red or yellow or green skin and sweet to tart crisp whitish flesh."
-    [apple_value]=1
+    [apple_value]=3
+
+    [stale_bread_modify_variable]="player_health"
+    [stale_bread_modify_value]=5
+    [stale_bread_description]="A brick disguised as bread. Surprisingly edible."
+    [stale_bread_value]=3
+
+    [ale_modify_variable]="player_health"
+    [ale_modify_value]=3
+    [ale_description]="Cheap ale strong enough to make bad sound good, and ugly look pretty."
+    [ale_value]=2
+
+    [minor_health_potion_modify_variable]="player_health"
+    [minor_health_potion_modify_value]=25
+    [minor_health_potion_description]="A tiny vial of red liquid prized by adventurers with shallow pockets."
+    [minor_health_potion_value]=15
+
+    [minor_mana_potion_modify_variable]="player_mana"
+    [minor_mana_potion_modify_value]=25
+    [minor_mana_potion_description]="A common potion used by novice mages who burn through mana too quickly"
+    [minor_mana_potion_value]=15
+
+    [ironwill_stout_modify_variable]="player_skill_points"
+    [ironwill_stout_modify_value]=1
+    [ironwill_stout_description]="Strong enough to make your chest burn and your instincts wake back up."
+    [ironwill_stout_value]=40
 )
 
 declare -gA object_data=(

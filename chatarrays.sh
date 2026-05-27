@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+declare -gA chat_states=(
+    [fandor_bartender]=0
+)
+
 waiting_chat(){
 printf '\e[?25l'
 for (( i=0; i<3; i++ )); do
@@ -167,6 +171,60 @@ This explains a lot, honestly."
 
 [dummy_default_4]="You ask the training dummy a question.
 The dummy's silence feels judgmental."
+
+#01bartender
+
+[bartender_firstmeeting]="\"New around here, are we?\"
+
+He sets aside a freshly cleaned mug and looks up at you.
+
+\"Name's Durgin Stonebeard. I run the bar around here, and keep the riff-raff
+in line when I have to. I sell a few adventuring supplies, brew a decent drink,
+and I don't mind sharing a bit of information with those who need it.\"
+
+The dwarf looks at you with his small, sunken eyes, silently awaiting your response."
+
+[bartender_default]="Durgin wipes down the counter with a worn rag before glancing your way.
+
+\"Need a drink, supplies, or information?\"
+
+The old dwarf rests his thick arms against the counter, waiting patiently."
+
+[bartender_info_0]="Durgin scratches at his beard thoughtfully.
+\"Most adventurers don't die in dungeons.
+They die because they get careless.\""
+
+[bartender_info_1]="\"If you're heading outside the city walls,
+keep a few healing supplies on you.
+You'll regret it the first time you don't.\""
+
+[bartender_info_2]="The dwarf lets out a quiet grunt.
+\"Monsters ain't always the worst thing you'll meet out there.
+Remember that.\""
+
+[bartender_info_3]="\"A good adventurer knows when to run.
+The dead ones usually thought they were too strong for that.\""
+
+[bartender_info_4]="Durgin taps the side of his mug.
+\"People talk more after a few drinks.
+You'd be surprised what information finds its way through this bar.\""
+
+[bartender_info_5]="\"Dungeon layouts can shift sometimes.
+Never trust your memory alone down there.\""
+
+[bartender_info_6]="The bartender narrows his eyes slightly.
+\"If a place suddenly goes quiet,
+there's usually a reason for it.\""
+
+[bartender_info_7]="\"Fresh adventurers spend all their coin on weapons.
+Experienced ones spend it on staying alive.\""
+
+[bartender_info_8]="Durgin chuckles to himself.
+\"Every rank thinks they're tougher than the last one did.\""
+
+[bartender_info_9]="\"You can learn a lot about a person
+by how they treat the tavern staff.
+Especially adventurers.\""
 
 )
 

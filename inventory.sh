@@ -11,6 +11,7 @@ declare -gA player_inventory=(
     [necklace_of_life]=1
     [necklace_of_mana]=1
     [apple]=2
+    [ironwill_stout]=2
 )
 
 add_item_handler() {
@@ -135,19 +136,50 @@ use_consumable(){
     if [[ -v player_inventory[$consume] ]];then
         local modify_var="${consumable_data[${consume}_modify_variable]}"
         local modify_val="${consumable_data[${consume}_modify_value]}"
-        local -n stat="$modify_var"
 
         remove_item_handler "$consume"
-        
-        case $stat in
-            "${player_health}")
-            recover_health $modify_val
-            desc_room
-            echo
-            echo "Consuming the $consume you heal for $modify_val points!"
-            stat_modifi_handler
-            echo "Your health is $player_health/$max_health"
+      
+        case $modify_var in
+            player_health)
+                local current_health=$player_health
+                recover_health $modify_val
+                local gained_health=$(( player_health - current_health ))
+                desc_room
+                echo
+                echo "Consuming the ${consume//_/ } you heal for $gained_health points!"
+                stat_modifi_handler
+                echo "Your health is $player_health/$max_health"
             ;;
+
+            player_mana)
+                local current_mana=$player_mana
+                recover_mana $modify_val
+                local gained_mana=$(( player_mana - current_mana ))
+                desc_room
+                echo
+                echo "Consuming the ${consume//_/ } you recover $gained_mana mana!"
+                stat_modifi_handler
+                echo "Your mana is $player_mana/$max_mana"
+                ;;
+
+            player_skill_points)
+                local current_skill_points=$player_skill_points
+                recover_skill_points $modify_val
+                local recover_status=$?
+
+                if (( recover_status == 2 ));then
+                    add_item_handler "$consume"
+                    return
+                else           
+                    local gained_skill_points=$(( player_skill_points - current_skill_points )) 
+                    clear
+                    desc_newline
+                    echo "Consuming the ${consume//_/ } you recover $gained_skill_points skill points!"
+                    stat_modifi_handler
+                    echo "Your skill points are $player_skill_points/$max_skill_points"
+                fi
+                ;;
+
         esac
 
     else

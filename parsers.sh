@@ -312,7 +312,8 @@ shopping_parser(){
         echo -e "${BOLD}${UNDERLINE}BUYING${RESET}\n"
         printf "%-32b %b\n" "${item_header}" "${prices_header}"
         for key in "${!current_vendor[@]}";do
-            printf "%-20s %5s\n" "${key^}" "${current_vendor[$key]}"
+            local display_key="${key//_/ }"
+            printf "%-20s %5s\n" "${display_key^}" "${current_vendor[$key]}"
         done
 
         echo -e "${UNDERLINE}                      ${RESET}\n"
@@ -345,6 +346,7 @@ shopping_parser(){
     fi
 
     read -r -p "> " input
+    [[ -z "${input}" ]] && return
     input="${input,,}"
 
     case $input in
@@ -353,6 +355,7 @@ shopping_parser(){
                 buying=true ; return
             else
                 read -r -p "Purchase what? " input #prompt for buying
+                [[ -z "${input}" ]] && return
                 input="${input,,}"
                 input="${input// /_}"
 
@@ -361,12 +364,12 @@ shopping_parser(){
                         (( player_gold -= current_vendor[$input] ))
                         add_item_handler "$input"
                     else
-                        echo "YOU DONT HAVE THE MONEY FOR THAT"
+                        echo "You don't have enough money for that."
                         press_any_to_continue
                         return
                     fi
                 else
-                    echo "ITEM DOES NOT EXIST"
+                    echo "\"I don't have ${input//_/ }\""
                     press_any_to_continue
                     return
                 fi
@@ -377,6 +380,7 @@ shopping_parser(){
                 buying=false ; return
             else
                 read -r -p "Sell what? " input #prompt for buying
+                [[ -z "${input}" ]] && return
                 input="${input,,}"
                 input="${input// /_}"
 
@@ -407,7 +411,7 @@ shopping_parser(){
                     fi
 
                 else
-                    echo "ITEM DOES NOT EXIST"
+                    echo "You try to scam the seller and sell them air, you fail."
                     press_any_to_continue
                 fi
             fi  
@@ -417,7 +421,10 @@ shopping_parser(){
         :
         ;;
         b|back)
-            exit
+            clear
+            flee_success=true
+            vendor=""
+            state="${prev_state}"
         ;;
         *)
             echo "Invalid Command"
