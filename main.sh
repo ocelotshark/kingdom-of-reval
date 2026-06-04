@@ -196,5 +196,20 @@ while [[ "${state}" == "shopping" ]]; do
     shopping_parser
 done
 
+#-------------------------
+#TROPHY SCREEN STATE
+#-------------------------
+
+while [[ "${state}" == "trophy_board" ]]; do
+trophy_board_handler
+done
+
+#-------------------------
+#TROPHY SCREEN STATE
+#-------------------------
+
+while [[ "${state}" == "portal_entrance" ]]; do
+portal_screen
+done
 
 done

@@ -278,15 +278,17 @@ chat_parser () {
 
         *bye*|goodbye|gb)
         #hehe ignore this bandaid underneath please
-        [[ "${char_creation_done}" == true ]] && char_creation_done="finished" && [[ "${location}" == "room_tutorial_end" ]] && location="guild_hall_center" 
+        if [[ "${char_creation_done}" == true ]] && char_creation_done="finished" && [[ "${location}" == "room_tutorial_end" ]];then
+            location="guild_hall_center" 
+            player_health="${max_health}"
+            player_mana="${max_mana}"
+            player_skill_points="${max_skill_points}"
+        fi
         who=""
         noun=""
         verb=""
         state="nav"
         flee_success=true
-        player_health="${max_health}"
-        player_mana="${max_mana}"
-        player_skill_points="${max_skill_points}"
         return
         ;;
 

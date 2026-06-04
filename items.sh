@@ -2,6 +2,7 @@
 
 declare -gA item_type=(
     [short_sword]="weapon"
+    [stick]="weapon"
     [cloth_tunic]="armor"
     [necklace_of_life]="accessory"
     [necklace_of_mana]="accessory"    
@@ -30,6 +31,7 @@ declare -gA item_type=(
 )
 declare -gA item_value=(
     [short_sword_value]=10
+    [stick_value]=0
     [cloth_tunic_value]=2
     [necklace_of_life_value]=50
     [necklace_of_mana_value]=50
@@ -44,6 +46,10 @@ declare -gA weapon_data=(
     [short_sword_damage]=5
     [short_sword_description]="The blade is roughly forged but will get the job done."
     [short_sword_value]=10
+
+    [stick_damage]=1
+    [stick_description]="There's many like it, but this on is yours."
+    [stick_value]=0
 
 )
 
@@ -124,11 +130,12 @@ declare -gA minor_quest_item_data=(
 
 declare -gA taste_data=(
     [short_sword]="You drag your tongue from hilt to tip. Weirdo. It tastes sharply metallic."
+    [stick]="You give the stick a good lick and end up with so many splinters."
     [long_sword]="You give the longer blade an experimental lick. Same sword taste, just more of it."
     [war_axe]="You lean in and give the axe a quick lick. It tastes like violence and poor impulse control."
     [twin_daggers]="You give each dagger a quick taste, as if one might be flavored differently. It is not."
     [sebilles_claymore]="You drag your tongue across the blade. Some relics are meant to inspire awe. 
-    Y o u . . . c h o s e . . . t h i s . . ."
+Y o u . . . c h o s e . . . t h i s . . ."
     [apple]="You give it a lick. It's an apple, not a mystery."
     [bread]="Your tongue brushes the crust. Crunchy outside, warm inside. Not your worst decision."
     [pie]="You sample the edge of the pie. Sugar, spice, and absolutely no regrets."
@@ -139,4 +146,56 @@ declare -gA taste_data=(
     [leather_armor]="You taste the leather straps for a moment too long. This has crossed into weird territory."
     [plate_armor]="You drag your tongue across the smooth surface. Slightly oily, definitely not edible."
     [clerk]="You actually try to lick the clerk. She stares at you in stunned silence. \"Absolutely not.\""
+    [trophy_board]="The wood is dry and bitter, with a hint of stale beer."
+    [bar_drink]="You grab an abandoned drink and take a bold swig.
+Thick tobacco spit coats your tongue."
+    [bar_counter]="You place your tongue against the counter.
+The wood is sticky.
+That single fact tells you everything you needed to know."
+    [bartender_taste]="You attempt to taste the bartender, but the counter is too wide.
+Instead, you awkwardly stick your tongue out in his direction."
+
+)
+
+declare -gA generic_taste_data=(
+    [floor_taste_0]="You lick the floor.
+A thick layer of greasy grime slides across your tongue like cold fat."
+    [floor_taste_1]="You press your tongue to the ground.
+Something wet pops beneath it."
+    [floor_taste_2]="You drag your tongue across the filthy floorboards.
+The taste of mildew, spit, and spoiled meat floods your mouth."
+    [floor_taste_3]="You give the floor a curious lick.
+A wad of something half-dried sticks briefly to your tongue."
+    [floor_taste_4]="You kneel down and taste the ground.
+Warm slime clings stringily to your lips as you pull away."
+    [floor_taste_5]="You lick a dark stain on the floor.
+The sour taste instantly makes your stomach tighten in warning."
+    [floor_taste_6]="You boldly lick the floorboards.
+Tiny grains, loose hairs, and greasy dirt crunch in your teeth."
+    [floor_taste_7]="You place your tongue against the damp floor.
+The flavor resembles spoiled broth left out in summer heat."
+    [floor_taste_8]="You run your tongue along the filthy ground.
+Something rancid bursts across your taste buds with horrifying force."
+    [floor_taste_9]="You sample the floor with a long lick.
+The texture is thick, sticky, and far warmer than it should be."
+    [wall_taste_0]="You lick the wall.
+A layer of damp grime peels across your tongue in oily streaks."
+    [wall_taste_1]="You press your tongue against the wall.
+The surface tastes like mold soaked in old smoke."
+    [wall_taste_2]="You drag your tongue slowly along the wall.
+Something crusted flakes loose into your mouth."
+    [wall_taste_3]="You cautiously lick the stained wall.
+A bitter taste of mildew and rotten moisture fills your throat."
+    [wall_taste_4]="You give the wall an experimental lick.
+The texture resembles wet cloth left to decay in a cellar."
+    [wall_taste_5]="You run your tongue across the damp surface.
+Warm slime stretches briefly before snapping back onto the wall."
+    [wall_taste_6]="You boldly taste the wall.
+Dust, grease, and something sour grind unpleasantly in your teeth."
+    [wall_taste_7]="You lick a dark patch on the wall.
+The foul taste instantly makes your eyes water."
+    [wall_taste_8]="You place your tongue against the cracked stone.
+Something gritty and damp shifts beneath the surface."
+    [wall_taste_9]="You slowly lick the filthy wall.
+The flavor resembles a rotting corpse."
 )

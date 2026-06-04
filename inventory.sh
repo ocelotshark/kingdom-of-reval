@@ -1,17 +1,15 @@
 #!/usr/bin/env bash
 
 declare -gA player_equipment=(
-    [weapon]=""
-    [armor]=""
+    [weapon]="stick"
+    [armor]="cloth_tunic"
     [accessory]=""
 )
 
 declare -gA player_inventory=(
-    [cloth_tunic]=1
     [necklace_of_life]=1
     [necklace_of_mana]=1
     [apple]=2
-    [ironwill_stout]=2
 )
 
 add_item_handler() {

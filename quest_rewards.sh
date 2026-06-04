@@ -2,10 +2,10 @@
 
 declare -gA quest_rewards=(
 
-    [f_rank_quest_xp]=15
-    [f_rank_quest_gold]=20
+    [f_rank_quest_xp]=30
+    [f_rank_quest_gold]=40
 
-    [e_rank_quest_xp]=25
-    [e_rank_quest_gold]=30
+    [e_rank_quest_xp]=50
+    [e_rank_quest_gold]=60
 
 )

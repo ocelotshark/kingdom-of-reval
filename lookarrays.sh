@@ -45,6 +45,10 @@ its depths, while the air around it feels strangely cold and heavy."
 and stained by rain, blood, and ale. Requests for monster hunts, escorts,
 missing persons, and dungeon expeditions crowd every inch of wood."
 
+[trophy_board]="Rows of carved names and tally marks cover
+the board. Some scratches are fresh, others faded with age. A few entries
+have been gouged so deeply into the wood it looks personal."
+
 [dummy_1]="A weathered training dummy stands here, covered in scars left by recruits
 who were, statistically speaking, ${ITALIC}more promising.${RESET}"
 

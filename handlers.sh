@@ -40,6 +40,86 @@ if [[ "${in_progress_random_dungeon[type]}" == "RESCUE" ]];then
 fi
 }
 
+portal_enter(){
+clear
+
+printf "\n\n\n"
+printf "Nothing remains.\n"
+
+sleep 2
+
+clear
+
+printf "\n\n\n"
+printf "A crimson sea swallows sight, sound, and thought.\n"
+
+sleep 3
+}
+
+portal_screen(){
+local input
+local material="${in_progress_random_dungeon[material],,}"
+material="${material//_/ }"
+local person="${in_progress_random_dungeon[rescue_name],,}"
+person="${person//_/ }"
+local -a person_array=($person)
+for i in "${!person_array[@]}"; do
+    person_array[$i]="${person_array[$i]^}"
+done
+person="${person_array[*]}"
+
+clear
+printf "\t\t%b\n" "THE ${RED}${BLINK}PORTAL${RESET} FILLS YOUR VIEW"
+printf "\n\n\n"
+echo -e "Crimson ripples grow and multiply within the borders of the
+oak-framed portal. You hear a low hum that vibrates through your
+chest. A strange gravitational pull beckons you inward."
+echo
+case "${in_progress_random_dungeon[type]}" in
+    "CLEAR ALL MONSTERS")
+        echo -e "${ITALIC}A sickness grows on the other side of the portal.${RESET}"
+    ;;
+    "COLLECT")
+        echo -e "${ITALIC}You need to find those ${material}s...
+You wonder what they're used for.${RESET}"
+    ;;
+    "RESCUE")
+        echo -e "${ITALIC}You catch glimpses of ${person}.
+You could swear they looked back at you with hopeful eyes.${RESET}"
+    ;;
+    *)
+        echo -e "${ITALIC}The portal churns silently.
+Something waits beyond, but it remains hidden from you.${RESET}"
+    ;;
+esac
+echo
+echo "E)nter Portal"
+echo "B)ack"
+echo
+while [[ -z "${input}" ]]; do
+read -r -p "> " input
+done
+
+input="${input,,}"
+case "${input}" in
+    e|enter)
+        portal_enter
+        wait
+        clear
+        use_portal
+        state="nav"
+    ;;
+    b|back)
+        clear
+        state="nav"
+        flee_success=true
+    ;;
+    *)
+    input=""
+    ;;
+esac
+}
+
 #-------------------------
 #DESCRIBE ROOM
 #-------------------------
@@ -126,6 +206,12 @@ desc_newline(){
     echo  
 }
 
+taste_here() {
+    local taste_text="$1"
+    desc_newline
+    echo -e "${ITALIC}$taste_text${RESET}" 
+}
+
 hurt_player(){
     screen_flash
     local lose=$1
@@ -164,6 +250,13 @@ taste_handler(){
     local simple_equipment=("${player_equipment[@]}")
     local found=false
 
+    case $noun in
+        beer)noun="drink";;
+        ale)noun="drink";;
+        brew)noun="drink";;
+        bar)noun="counter";;
+    esac
+
     for i in "${simple_inventory[@]}"; do
         if [[ "$noun" == "$i" ]];then
             desc_room
@@ -183,13 +276,40 @@ taste_handler(){
             return
         fi
     done
+    case $noun in
+
+    floor)
+        taste_here "${generic_taste_data[floor_taste_$(( RANDOM % 10 ))]}"
+        return
+        ;;
+    wall)
+        taste_here "${generic_taste_data[wall_taste_$(( RANDOM % 10 ))]}"
+        return
+        ;;
+    esac
 
     case $noun:$location in
 
     *clerk*:"guild_hall_center")
-            clerk_lick
-            return
-            ;;
+        clerk_lick
+        return
+        ;;
+    *board*:"fandor_gh_bar")
+        taste_here "${taste_data[trophy_board]}"
+        return
+        ;;
+    *drink*:"fandor_gh_bar")
+        taste_here "${taste_data[bar_drink]}"
+        return
+        ;;
+    *counter*:"fandor_gh_bar")
+        taste_here "${taste_data[bar_counter]}"
+        return
+        ;;
+    *bartender*:"fandor_gh_bar")
+        taste_here "${taste_data[bartender_taste]}"
+        return
+        ;;        
     esac
     
 [[ "${found}" == false ]] && desc_room ; echo ; echo -e "${ITALIC}You can't taste that${RESET}"
@@ -570,6 +690,30 @@ else
         desc_room
     fi
 fi
+
+#-------------------------
+#TROPHY BOARD HANDLER
+#-------------------------
+
+}
+trophy_board_handler(){
+    clear
+    echo -e "       ${BnR}TROPHY BOARD${RESET}"
+    echo
+    echo
+    echo -e "${UNDERLINE}Your Kills${RESET}"
+    for key in "${!enemy_kills[@]}"; do
+        display_key="${key//_/ }"
+        printf "%-16s %-3s %5s\n" "${display_key^^}" "-" "KILLS:${enemy_kills[$key]}"
+    done
+    echo -e "${UNDERLINE}                               ${RESET}"
+    echo
+    printf "Press any key to exit "
+    read -rn 1
+    clear
+    state="nav"
+    flee_success=true
+    echo
 }
 
 #-------------------------
@@ -614,6 +758,9 @@ look_handler() {
         ;;
         *board*:"guild_hall_center")
             echo "${object_look[quest_board]}"
+        ;;
+        *board*:"fandor_gh_bar")
+            echo "${object_look[trophy_board]}"
         ;;
         *portal*:"fandor_gh_outside")
             echo -e "${object_look[fandor_gh_portal]}"
@@ -756,14 +903,18 @@ use_handler() {
             noun="clerk"
             talk_handler
         ;;
+        *trophy*:"fandor_gh_bar")
+            state="trophy_board"
+        ;;
+        *board*:"fandor_gh_bar")
+            state="trophy_board"
+        ;;
         *dummy*:"fandor_gh_outside")
             combat_rank="Z"
             state="combat"
         ;;
-
-
         *portal*:"fandor_gh_outside")
-            use_portal
+            state="portal_entrance"
         ;;  
 
         *)

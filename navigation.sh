@@ -21,7 +21,7 @@ story_navigation () {
                     desc_room
                 ;;
                 "north":"fandor_gh_bar")
-                    echo -e "${WARNING}UNDER CONSTRUCTION!!${RESET}"
+                    state="trophy_board"
                 ;;                
             "north":"guild_hall_center")
                 verb="talk"
@@ -34,10 +34,10 @@ story_navigation () {
                 desc_room
             ;;
             "east":"fandor_gh_outside")
-                use_portal
+                state="portal_entrance"
             ;;
             "portal":"fandor_gh_outside")
-                use_portal
+                state="portal_entrance"
             ;;
             "west":"fandor_gh_outside")
                 combat_rank="Z"
