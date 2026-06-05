@@ -320,13 +320,19 @@ taste_handler(){
 #-------------------------
 recover_mana() {
     local mana_add=$1
-    (( player_mana + mana_add <= max_mana )) && (( player_mana += mana_add ))
-    (( player_mana + mana_add > max_mana )) && player_mana=$max_mana
+    if (( player_mana + mana_add <= max_mana ));then
+        (( player_mana += mana_add ))
+    else
+        player_mana=$max_mana
+    fi
 }
 recover_health() {
     local health_add=$1
-    (( player_health + health_add <= max_health )) && (( player_health += health_add ))
-    (( player_health + health_add > max_health )) && player_health=$max_health
+    if (( player_health + health_add <= max_health ));then
+        (( player_health += health_add ))
+    else 
+        player_health=$max_health
+    fi
 }
 
 recover_skill_points() {
@@ -1090,6 +1096,10 @@ talk_handler() {
                 echo -e "${fandor_guild[bartender_default]}"
             fi
         ;;
+        "bar":"fandor_gh_bar")
+            desc_newline
+            echo -e "${talk_object[bar]}"
+        ;;
 
         "dummy":"fandor_gh_outside")
             who="dummy"
@@ -1180,16 +1190,16 @@ chat_handler() {
 
         case $verb:$who in
            "yes":"clerk")
-                echo -e "Of course you are. \nShe hands you a document, dips a quill in ink and hands it you."
+                echo -e "Of course you are. \nShe dips a quill in ink, and hands it to you with a document."
                 character_creation_handler
             ;;
             "reg"*:"clerk")
-                echo "She hands you a document, dips a quill in ink and hands it you."
+                echo "She dips a quill in ink, and hands it to you with a document."
                 character_creation_handler
             ;;
             "collect"*:"clerk")
                 echo -e "${fandor_guild[clerk_collection]}"
-                echo "She hands you a document, dips a quill in ink and hands it you."
+                echo "She dips a quill in ink, and hands it to you with a document."
                 character_creation_handler           
             ;;
             *:"clerk")

@@ -131,21 +131,33 @@ declare -gA minor_quest_item_data=(
 declare -gA taste_data=(
     [short_sword]="You drag your tongue from hilt to tip. Weirdo. It tastes sharply metallic."
     [stick]="You give the stick a good lick and end up with so many splinters."
-    [long_sword]="You give the longer blade an experimental lick. Same sword taste, just more of it."
-    [war_axe]="You lean in and give the axe a quick lick. It tastes like violence and poor impulse control."
-    [twin_daggers]="You give each dagger a quick taste, as if one might be flavored differently. It is not."
-    [sebilles_claymore]="You drag your tongue across the blade. Some relics are meant to inspire awe. 
+    [long_sword]="You give the longer blade an experimental lick. 
+Same sword taste, just more of it."
+    [war_axe]="You lean in and give the axe a quick lick. 
+It tastes like violence and poor impulse control."
+    [twin_daggers]="You give each dagger a quick taste, 
+as if one might be flavored differently. It is not."
+    [sebilles_claymore]="You drag your tongue across the blade. 
+Some relics are meant to inspire awe. 
 Y o u . . . c h o s e . . . t h i s . . ."
     [apple]="You give it a lick. It's an apple, not a mystery."
-    [bread]="Your tongue brushes the crust. Crunchy outside, warm inside. Not your worst decision."
-    [pie]="You sample the edge of the pie. Sugar, spice, and absolutely no regrets."
-    [health_potion]="You lick the bottle like you're unsure of its contents. It tastes promising. The next step is usually drinking it."
-    [mana_potion]="You sample the edge of the vial. Definitely magical. Still not as useful as drinking it."
-    [potion_of_discipline]="You lick the bottle like you're testing it. The potion somehow feels disappointed in you. Drinking it might improve that."
+    [bread]="Your tongue brushes the crust. 
+Crunchy outside, warm inside. Not your worst decision."
+    [pie]="You sample the edge of the pie. 
+Sugar, spice, and absolutely no regrets."
+    [health_potion]="You lick the bottle like you're unsure of its contents. 
+It tastes promising. The next step is usually drinking it."
+    [mana_potion]="You sample the edge of the vial. Definitely magical. 
+Still not as useful as drinking it."
+    [potion_of_discipline]="You lick the bottle like you're testing it. 
+The potion somehow feels disappointed in you. Drinking it might improve that."
     [cloth_tunic]="Worn cloth, stale air, and just a hint of body odor."
-    [leather_armor]="You taste the leather straps for a moment too long. This has crossed into weird territory."
-    [plate_armor]="You drag your tongue across the smooth surface. Slightly oily, definitely not edible."
-    [clerk]="You actually try to lick the clerk. She stares at you in stunned silence. \"Absolutely not.\""
+    [leather_armor]="You taste the leather straps for a moment too long. 
+This has crossed into weird territory."
+    [plate_armor]="You drag your tongue across the smooth surface. 
+Slightly oily, definitely not edible."
+    [clerk]="You actually try to lick the clerk. 
+She stares at you in stunned silence. \"Absolutely not.\""
     [trophy_board]="The wood is dry and bitter, with a hint of stale beer."
     [bar_drink]="You grab an abandoned drink and take a bold swig.
 Thick tobacco spit coats your tongue."
@@ -155,6 +167,11 @@ That single fact tells you everything you needed to know."
     [bartender_taste]="You attempt to taste the bartender, but the counter is too wide.
 Instead, you awkwardly stick your tongue out in his direction."
 
+)
+
+declare -gA talk_object=(
+    [bar]="${ITALIC}\"How's it going?\"${RESET} you ask the wooden bar.
+You get no response. Multiple patrons distance themselves from you."
 )
 
 declare -gA generic_taste_data=(

@@ -46,18 +46,18 @@ their place among legends.
 From lowly guild errands to deadly dungeon contracts, every hunt, victory,
 and near-death encounter brings you one step closer to the impossible goal:
 
-${YELLOW}${BOLD}${REVERSE}S-Rank.${RESET}
+\t     ${YELLOW}${BOLD}${REVERSE}S-Rank.${RESET}
 
 Few ever reach it. Fewer survive long enough to try.
 You push open the heavy wooden doors. Warm light spills out to meet you,
 along with the low hum of voices and clinking mugs.
 
-Adventurers crowd long tables—some laughing, some arguing, 
+Adventurers crowd long tables some laughing, some arguing, 
 some staring quietly into their drinks.
 
 Steel, leather, and old scars.
 
-${REVERSE}${BOLD}This is the Guild.${RESET}
+${REVERSE}${BOLD}\tThis is the Guild.${RESET}
 
 ${DIM}${BLINK}TUTORIAL: Type a command and press enter. 
 Type 'start' ${RESET}
@@ -65,12 +65,12 @@ Type 'start' ${RESET}
 
 [room_reg_tutorial]="At the far end of the hall, a worn counter stands beneath a crooked sign:
 
-${REVERSE}REGISTRATION${RESET}
+${REVERSE}\tREGISTRATION${RESET}
 
 A tired-looking clerk flips through a stack of parchment, 
 not bothering to look up. Ink stains their fingers. 
 
-Their patience looks thinner.
+Her patience looks thin.
 
 ${DIM}${BLINK}TUTORIAL: Type the action you would like to achieve:
 Type 'talk to the clerk' ${RESET}
@@ -109,13 +109,13 @@ To the ${BLUE}east${RESET}, a crowded quest board bristles with pinned notices,
 edges curled and ink fading, each one quietly promising trouble. 
 
 Behind you, to the ${BLUE}south${RESET}, the heavy doors stand as the only 
-real escape—back to open air, and whatever mess you choose to walk into next."
+real escape back to open air, and whatever mess you choose to walk into next."
 
 [fandor_gh_bar]="The guild bar is tucked into the western side of the hall. 
-Where torchlight meets smoke and the smell of spilled ale never quite leaves the air.
+Where torchlight meets smoke and the smell of spilled ale.
 
-Scarred mugs, loud laughter, and half-finished stories crowd every inch of it.
-More rumors, contracts, and bad decisions have started here than anyone cares to admit.
+Empty mugs, loud laughter, and half-finished stories crowd every inch of it.
+A great many rumors, quests, and bad decisions have started here.
 
 The bartender is busy cleaning the bar which stretches from wall to wall.
 

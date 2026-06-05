@@ -193,16 +193,8 @@ if [[ "${first_load}" == false ]]; then #REGULAR PARSING
             fi 
         ;;
 
-        sda)
-        for key in ${!player_inventory[@]};do 
-        echo "$key ${player_inventory[$key]}"
-        done
-        for key in ${!item_type[@]};do 
-        echo "$key ${item_type[$key]}"
-        done
-        for key in ${!minor_quest_item_data[@]};do 
-        echo "$key ${minor_quest_item_dat[$key]}"
-        done
+        shs)
+        printf '%b\n' "${max_health}"
         ;;
         "exit")
             exit_dungeon_handler
@@ -358,6 +350,7 @@ shopping_parser(){
             else
                 read -r -p "Purchase what? " input #prompt for buying
                 [[ -z "${input}" ]] && return
+                local disp_input="${input}"
                 input="${input,,}"
                 input="${input// /_}"
 
@@ -365,6 +358,8 @@ shopping_parser(){
                     if (( (player_gold - current_vendor[$input]) >= 0 ));then #enough money?
                         (( player_gold -= current_vendor[$input] ))
                         add_item_handler "$input"
+                        echo -e "${ITALIC}${disp_input^} added to inventory.${RESET}"
+                        press_any_to_continue
                     else
                         echo "You don't have enough money for that."
                         press_any_to_continue

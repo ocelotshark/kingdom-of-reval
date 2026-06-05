@@ -201,6 +201,8 @@ take_quest() {
     done
 
     in_progress_random_dungeon[state]=true
+    in_progress_random_dungeon[enemies_killed]=0
+    in_progress_random_dungeon[material_collected]=0
 }
 
 read_qb() {

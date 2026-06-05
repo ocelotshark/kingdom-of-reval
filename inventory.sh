@@ -10,6 +10,7 @@ declare -gA player_inventory=(
     [necklace_of_life]=1
     [necklace_of_mana]=1
     [apple]=2
+    
 )
 
 add_item_handler() {
@@ -19,12 +20,12 @@ add_item_handler() {
 }
 
 view_inventory() {
-        desc_room
-        echo
+    desc_room
+    echo
 
-        local count=0
-
-        for key in "${!player_inventory[@]}"; do
+    local count=0
+    printf '%b\n' "${YELLOW}${ITALIC}Gold Pouch: ${player_gold}${RESET}"
+    for key in "${!player_inventory[@]}"; do
         local value="${player_inventory[$key]}"
         local display_key="${key//_/ }"
         display_key="${display_key,,}"
@@ -34,9 +35,9 @@ view_inventory() {
         ((count++))
 
         (( count % 4 == 0 )) && printf '\n'
-
     done
-        (( count % 4 != 0 )) && printf '\n'
+    
+    (( count % 4 != 0 )) && printf '\n'
 }
 
 view_equipment() {

@@ -28,15 +28,15 @@ It's also how you'll allocate points gained
 by leveling up to increase your stats.
 
 Here's a quick overview of how stat points work: 
-${DIM}${BLINK} You can always review these from the game manual. ${RESET}
+${DIM}${BLINK}You can always review these from the game manual. ${RESET}
 
-${BOLD}Determination:${RESET} For every 10 points in determination 
+${BnR}Determination:${RESET} For every 10 points in determination 
 you'll receive 1 ${ITALIC}skill${RESET} point added to your maximum skill points.
 
-${BOLD}Strength:${RESET} For every 3 points in stength 
+${BnR}Strength:${RESET} For every 3 points in stength 
 you'll receive 1 ${ITALIC}attack${RESET} point added to your maximum attack.
 
-${BOLD}Intelligence:${RESET} For every point in intelligence 
+${BnR}Intelligence:${RESET} For every point in intelligence 
 you'll receive 3 points of maximum ${ITALIC}mana${RESET}.
 "
 [quest_board_how_to]="${DIM}NEW ADVENTURERS READ: ONLY ONE MINOR QUEST CAN BE HELD AT A TIME
@@ -54,8 +54,7 @@ ${BLINK}Registration${RESET}, ${BLINK}collection${RESET}, or just here to ${BLIN
 
 [clerk_collection]="I only deal with registered adventurers."
 
-[clerk_class]="She drags a quill across the page without looking up. 
-\"Alright… you wrote down ${name}. That’s something.\"
+[clerk_class]="\"Alright… you wrote down ${name}. That’s something.\"
 
 A pause. She squints at the parchment like it personally offended her.
 
@@ -182,7 +181,8 @@ He sets aside a freshly cleaned mug and looks up at you.
 in line when I have to. I sell a few adventuring supplies, brew a decent drink,
 and I don't mind sharing a bit of information with those who need it.\"
 
-The dwarf looks at you with his small, sunken eyes, silently awaiting your response."
+The dwarf looks at you with his small, sunken eyes, 
+silently awaiting your response."
 
 [bartender_default]="Durgin wipes down the counter with a worn rag before glancing your way.
 

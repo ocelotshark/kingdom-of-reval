@@ -9,14 +9,8 @@ declare -gA npc_look=(
 
 [clerk_default]="You study the clerk for a moment.
 
-She moves with the kind of practiced efficiency that makes everyone else feel slow. 
-Her Cornwall-blue dress is neat despite the endless stacks of parchment, ink, and half-finished forms surrounding her. 
-Dark circles sit beneath sharp, focused eyes, the quiet mark of too many late nights and too few breaks.
-
-She rarely looks up for long, her quill already moving before most people finish speaking. 
-Even the loudest adventurers lower their voices near her desk.
-
-Whatever keeps this guild standing… it’s probably passed through her hands first." 
+Whatever keeps this guild standing..
+it’s probably passed through her hands first." 
 
 )
 
