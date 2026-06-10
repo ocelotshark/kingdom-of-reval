@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 clear
 
-portal_enter(){
-printf "\n\n\n"
-printf "Nothing remains.\n"
-
-sleep 1
-
-clear
-
-printf "\n\n\n"
-printf "A crimson sea swallows sight, sound, and thought.\n"
-
-sleep 1.5
+player_level_array_gen(){
+declare -gA player_levels
+for ((i=2;i<100;i++));do
+    player_levels[$i]=$(( 50 * i * i - 100 ))
+done
 }
+
+player_level_array_gen
+
+for ((i=2;i<100;i++));do
+    echo -e "level:$i - ${player_levels[$i]}\n"
+done
+

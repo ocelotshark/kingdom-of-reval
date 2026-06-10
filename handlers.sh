@@ -42,7 +42,7 @@ fi
 
 portal_enter(){
 clear
-
+hide_cursor
 printf "\n\n\n"
 printf "Nothing remains.\n"
 
@@ -54,6 +54,7 @@ printf "\n\n\n"
 printf "A crimson sea swallows sight, sound, and thought.\n"
 
 sleep 3
+show_cursor
 }
 
 portal_screen(){
@@ -206,9 +207,17 @@ desc_newline(){
     echo  
 }
 
+echo_arg_and_desc_room(){
+    local arg="$1"
+    desc_newline
+    echo -e "\n-\n"
+    echo -e "$arg"
+}
+
 taste_here() {
     local taste_text="$1"
     desc_newline
+    echo -e "\n-\n"
     echo -e "${ITALIC}$taste_text${RESET}" 
 }
 
@@ -363,12 +372,11 @@ recover_skill_points() {
 #-------------------------
 defend_handler() {
 if (( player_defense > 0 )); then
-defend_weight=$(( RANDOM % $player_defense + 2 ))
-defended_damage=$(( eattack / defend_weight ))
-defended_against=$(( eattack - defended_damage ))
+local damage=$(( eattack * eattack / ( eattack + player_defense ) ))
+local defended_against=$(( eattack - damage ))
 action1="You defended against $defended_against pts! Focusing your mana is now $player_mana/$max_mana!"
-action2="$ename hits you for $defended_damage"
-player_health=$(( player_health - defended_damage ))
+action2="$ename hits you for $damage"
+player_health=$(( player_health - damage ))
 recover_mana $mana_recovery
 else
 action1="You have zero defense, you defend with hope. Hope isn't very good armor"
@@ -376,6 +384,11 @@ action2="$ename hits you for $eattack"
 player_health=$(( player_health - $eattack ))
 recover_mana $mana_recovery
 fi
+}
+
+armor_handler(){
+    local damage=$(( eattack * eattack / ( eattack + player_defense ) ))
+    eattack=$damage
 }
 
 #-------------------------
@@ -405,8 +418,8 @@ exit_dungeon_handler(){
                                 desc_newline
                             ;;
                             *)
+                                echo -e "${UNDERLINE}Invalid Command: You remain in the dungeon.${RESET}\n"
                                 desc_newline 
-                                echo "Yes or No?"
                             ;;
                         esac
                     else #you aint on a quest homie
@@ -414,6 +427,7 @@ exit_dungeon_handler(){
                         state="nav"
                         location="${prev_nav_location}"
                         reverse_direction=""
+                        combat_rank="${base_rank}"
                         desc_newline
                     fi
                 else
@@ -742,37 +756,43 @@ look_handler() {
     case $noun:$location in
 
         *clerk*:"guild_hall_center")
-            echo "${npc_look[clerk_default]}"
+            echo_arg_and_desc_room "${npc_look[clerk_default]}"
         ;;
         "north":"guild_hall_center")
-            echo "${npc_look[clerk_default]}"
+            echo_arg_and_desc_room "${npc_look[clerk_default]}"
         ;;        
         *desk*:"guild_hall_center")
-            echo "${npc_look[clerk_default]}"
+            echo_arg_and_desc_room "${npc_look[clerk_default]}"
         ;;
         "south":"guild_hall_center")
-            echo "${object_look[fandor_gh_door]}"
+            echo_arg_and_desc_room "${object_look[fandor_gh_door]}"
         ;;
         *door*:"guild_hall_center"|*door*:"fandor_gh_outside")
-            echo "${object_look[fandor_gh_door]}"
+            echo_arg_and_desc_room "${object_look[fandor_gh_door]}"
         ;;
         "west":"guild_hall_center")
-            echo "${object_look[fandor_gh_bar]}"
+            echo_arg_and_desc_room "${object_look[fandor_gh_bar]}"
         ;;
         *bar*:"guild_hall_center")
-            echo "${object_look[fandor_gh_bar]}"
+            echo_arg_and_desc_room "${object_look[fandor_gh_bar]}"
         ;;
         *board*:"guild_hall_center")
-            echo "${object_look[quest_board]}"
+            echo_arg_and_desc_room "${object_look[quest_board]}"
         ;;
         *board*:"fandor_gh_bar")
-            echo "${object_look[trophy_board]}"
+            echo_arg_and_desc_room "${object_look[trophy_board]}"
         ;;
+        "bar":"fandor_gh_bar")
+            echo_arg_and_desc_room "${object_look[bar]}"
+        ;;      
+        "bartender":"fandor_gh_bar")
+            echo_arg_and_desc_room "${npc_look[bartender]}"
+        ;;             
         *portal*:"fandor_gh_outside")
-            echo -e "${object_look[fandor_gh_portal]}"
+            echo_arg_and_desc_room "${object_look[fandor_gh_portal]}"
         ;;
         *dummy*:"fandor_gh_outside")
-            echo -e "${object_look[dummy_1]}"
+            echo_arg_and_desc_room "${object_look[dummy_1]}"
         ;;        
         *)
             if [[ -n "${noun}" ]]; then #if its an unknown noun
@@ -915,6 +935,16 @@ use_handler() {
         *board*:"fandor_gh_bar")
             state="trophy_board"
         ;;
+        *bar*:"fandor_gh_bar"|*drink*:"fandor_gh_bar"|*food*:"fandor_gh_bar")
+            who="durgin"
+            state="chat"
+            if (( chat_states[fandor_bartender] == 0 ));then
+                echo -e "${fandor_guild[bartender_firstmeeting]}"
+                chat_states[fandor_bartender]=1
+            else
+                echo -e "${fandor_guild[bartender_default]}"
+            fi
+        ;;
         *dummy*:"fandor_gh_outside")
             combat_rank="Z"
             state="combat"
@@ -959,10 +989,10 @@ class_confirm() {
             [[ -z "${input_class}" ]] && class_confirm
             input_class="${input_class,,}"
             case $input_class in
-                w|warrior) input_class="warrior";;
-                c|cleric) input_class="cleric";;
-                m|mage) input_class="mage";;
-                p|paladin) input_class="paladin";;
+                w|warrior) input_class="warrior" && player_inventory[necklace_of_life]=1 ;;
+                c|cleric) input_class="cleric" && player_inventory[necklace_of_life]=1 ;;
+                m|mage) input_class="mage" && player_inventory[necklace_of_mana]=1 ;;
+                p|paladin) input_class="paladin" && player_inventory[necklace_of_mana]=1 ;;
                 *) echo "Choose a class from the list please" && class_confirm
             esac
 
@@ -1145,6 +1175,10 @@ talk_handler() {
 
             (( player_gold += quest_rewards[$gold_reward] ))
             (( player_xp += quest_rewards[$xp_reward] ))
+            level_up_check
+            local lvled_up=$?
+            (( lvled_up == 13 )) && echo -e "\n${BnR}YOU'RE NOW LEVEL $lvl!${RESET}\n"
+
 
             # clean up {------------------
             for item in "${!player_inventory[@]}";do
@@ -1410,6 +1444,7 @@ for (( i=0; i<${#player_skills[@]}; i++ ));do
                         ehp=$((ehp - skill_damage))
                         death_handler ; [[ "${enemy_dead}" == true ]] && return                        
                         action1="You cast $lower_case_skills on the $ename for $skill_damage pts! It cost you $skill_cost skill points."
+                        armor_handler
                         player_health=$(( player_health - eattack ))
                         action2="$ename hits you for $eattack pts."
                         found=true
@@ -1445,6 +1480,7 @@ for (( i=0; i<${#player_spells[@]}; i++ ));do
                         ehp=$((ehp - magic_damage))
                         death_handler ; [[ "${enemy_dead}" == true ]] && return
                         action1="You cast $lower_case_spell on the $ename for $magic_damage pts! It cost you $mana_cost mana."
+                        armor_handler
                         player_health=$(( player_health - eattack ))
                         action2="$ename hits you for $eattack pts."
                         found=true
@@ -1574,6 +1610,7 @@ melee_attack_handler() {
     ehp=$((ehp - attackdamage))
     death_handler ; [[ "${enemy_dead}" == true ]] && return
     action1="You hit the $ename for $attackdamage pts!"
+    armor_handler
     player_health=$(( player_health - eattack ))
     action2="$ename hits you for $eattack"
 }

@@ -48,8 +48,11 @@ esac
 (( player_xp += xp_gain ))
 local gold_gain="$(enemy_loot)"
 (( player_gold += $gold_gain ))
+level_up_check
+local lvled_up=$?
 
 echo "$display_death"
+(( lvled_up == 13 )) && echo -e "\n${BnR}YOU'RE NOW LEVEL $lvl!${RESET}"
 echo
 echo "Through your efforts you gain $xp_gain points of experience"
 echo "The $ename drops $gold_gain gold coins"

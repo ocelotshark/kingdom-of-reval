@@ -53,12 +53,17 @@ story_mode_parser() {
             wield) verb="use" ;;
             eat) verb="use" ;;
             drink) verb="use" ;;
+            order) verb="use" ;;
+            buy) verb="use" ;;
+            purchase) verb="use" ;;
+            sell) verb="use" ;;
+            browse) verb="use" ;;
             lick) verb="taste" ;;
             ex) verb="exit" ;;
         esac
 
 
-        ignored_words=("at" "the" "it" "to" "in" "on" "with" "from" "into" "inside")
+        ignored_words=("at" "the" "it" "to" "in" "on" "with" "from" "into" "inside" "around")
 
         for (( i=1; i<${#input[@]}; i++));do #loop through input minus verb
             input_iteration="${input[i]}"
@@ -194,7 +199,7 @@ if [[ "${first_load}" == false ]]; then #REGULAR PARSING
         ;;
 
         shs)
-        printf '%b\n' "${max_health}"
+        printf "CRANK = %s\n" "$combat_rank"
         ;;
         "exit")
             exit_dungeon_handler

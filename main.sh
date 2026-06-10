@@ -40,8 +40,8 @@ location_tmp="$location"
 
 lvl=1
 lvl_points=10
-player_xp=0
-xp_to_next_lvl=100
+player_xp=99
+xp_to_next_lvl="${player_levels[$(( lvl + 1 ))]}"
 
 strength=0
 determination=0
@@ -74,6 +74,7 @@ player_spells=("Fireball" "Magic Missile")
 player_uffs=()
 declare -gA has_material=()
 declare -gA enemy_kills=()
+player_level_array_gen
 
 in_random_dungeon=false
 flee_success=false
@@ -92,7 +93,7 @@ buying=true
 
 for arg in "$@"; do 
   case "$arg" in
-    -sn|--skipn)
+    -db|--debugger)
       name="Debugger"
       class="warrior"
       race="human"
@@ -100,14 +101,12 @@ for arg in "$@"; do
       location="guild_hall_center"
       first_load=false
       state="nav"
+      stat_modifi_handler
       ;;
     -god|--godmode)
       player_health=9999
       player_mana=9999
       player_skill_points=9999
-      ;;
-    -shop)
-     state="shopping"
       ;;
   esac
 done

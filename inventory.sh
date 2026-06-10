@@ -7,8 +7,7 @@ declare -gA player_equipment=(
 )
 
 declare -gA player_inventory=(
-    [necklace_of_life]=1
-    [necklace_of_mana]=1
+
     [apple]=2
     
 )

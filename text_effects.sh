@@ -2,6 +2,14 @@
 
 RESET="\e[0m"
 
+hide_cursor() {
+    printf '\e[?25l'
+}
+
+show_cursor() {
+    printf '\e[?25h'
+}
+
 # Core effects
 BOLD="\e[1m"
 DIM="\e[2m"

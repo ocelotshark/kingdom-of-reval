@@ -98,6 +98,35 @@ reputation_to_string() {
 
 }
 
+player_level_array_gen(){
+declare -gA player_levels
+for ((i=2;i<100;i++));do
+    player_levels[$i]=$(( 50 * i * i - 100 ))
+done
+}
+
+max_player_stats(){
+    player_health=$max_health
+    player_mana=$max_mana
+    player_skill_points=$max_skill_points
+}
+
+level_up_check(){
+
+    if (( player_xp >= xp_to_next_lvl )); then
+        (( lvl++ ))
+        local left_overs=$(( player_xp - xp_to_next_lvl ))
+        xp_to_next_lvl="${player_levels[$(( lvl + 1 ))]}"
+        player_xp=$left_overs
+        (( lvl_points+=5 ))
+        stat_modifi_handler
+        max_player_stats
+        return 13
+    else
+        return 0
+    fi
+}
+
 press_any_to_continue() {
         read -rsn1 -p "Press any key to continue..."
         echo

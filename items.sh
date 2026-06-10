@@ -54,7 +54,7 @@ declare -gA weapon_data=(
 )
 
 declare -gA armor_data=(
-    [cloth_tunic_defense]=1
+    [cloth_tunic_defense]=2
     [cloth_tunic_description]="A cheap tunic made of cloth."
     [cloth_tunic_value]=2
     
@@ -166,7 +166,11 @@ The wood is sticky.
 That single fact tells you everything you needed to know."
     [bartender_taste]="You attempt to taste the bartender, but the counter is too wide.
 Instead, you awkwardly stick your tongue out in his direction."
-
+    [necklace_of_life]="You nibble on the ruby stone.
+A toothache you've been dealing with feels better now."
+    [necklace_of_mana=]="You drag your tongue across the smooth stone.
+A faint crackle pops against your tongue.
+That was ... probably fine."
 )
 
 declare -gA talk_object=(
