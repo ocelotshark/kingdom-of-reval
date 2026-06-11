@@ -133,6 +133,11 @@ while true; do
 
     while [[ "${state}" == "nav" ]]; do
     story_mode_parser
+    parser_status=$?
+    if (( parser_status == 99 )); then
+        source "saves/$LOAD_FILE"
+        desc_room
+    fi
     done
 
 #-------------------------

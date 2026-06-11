@@ -199,7 +199,17 @@ if [[ "${first_load}" == false ]]; then #REGULAR PARSING
         ;;
 
         shs)
-        printf "CRANK = %s\n" "$combat_rank"
+        player_gold=999
+        ;;
+        save)
+            save_handler
+        ;;
+        load)
+            load_handler
+            return 99
+        ;;
+        delete)
+            delete_handler
         ;;
         "exit")
             exit_dungeon_handler

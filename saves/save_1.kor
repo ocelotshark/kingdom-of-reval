@@ -1,0 +1,33 @@
+declare -- location="guild_hall_center"
+declare -- name="Debugger"
+declare -- player_rank="bronze"
+declare -- class="warrior"
+declare -- race="human"
+declare -- player_gold="50"
+declare -- lvl="1"
+declare -- lvl_points="10"
+declare -- player_xp="99"
+declare -- strength="0"
+declare -- determination="0"
+declare -- intelligence="0"
+declare -- base_max_health="100"
+declare -- max_health="110"
+declare -- player_health="100"
+declare -- base_max_mana="60"
+declare -- max_mana="60"
+declare -- player_mana="60"
+declare -- mana_recovery="5"
+declare -- base_attack="1"
+declare -- player_attack="3"
+declare -- base_defense="0"
+declare -- player_skill_points="0"
+declare -- base_skill_points="1"
+declare -- max_skill_points="1"
+declare -- player_reputation="50"
+declare -- base_rank="F"
+declare -a player_skills=([0]="Cleave" [1]="Shadow Step")
+declare -a player_spells=([0]="Fireball" [1]="Magic Missile")
+declare -A player_equipment=([weapon]="stick" [accessory]="" [armor]="cloth_tunic" )
+declare -A player_inventory=([apple]="2" )
+declare -A enemy_kills=()
+declare -A chat_states=([fandor_bartender]="0" )

@@ -8,6 +8,7 @@ f_min_damage=1
 e_max_damage=20
 e_min_damage=4
 
+
 check_for_material() {
 if [[ "${in_progress_random_dungeon[type]}" == "COLLECT" ]];then 
     quest_object_here=false
@@ -1697,5 +1698,175 @@ combat_handler() {
 
     fi
 
+
+}
+
+save_handler(){
+    local file_name
+    local overwrite_confirm
+
+    read -r -p "FILE SAVE NAME > " file_name
+    [[ -z "${file_name}" ]] && clear && desc_room && return
+
+    file_name="${file_name,,}"
+    file_name="${file_name// /_}"
+    file_name="${file_name}.kor"
+
+    if [[ -f "saves/$file_name" ]]; then
+
+        read -r -p "A file with the same name already
+exist. Do you want to overwrite it?
+
+Yes or No > " overwrite_confirm
+
+        overwrite_confirm="${overwrite_confirm,,}"
+        case $overwrite_confirm in
+            n|no)
+                clear
+                desc_newline
+                return
+            ;;
+            y|yes) : ;;
+            *)
+                clear
+                desc_newline
+                return
+            ;;
+        esac
+    fi
+
+    local save_game_data=(
+        location
+        prev_location
+        name
+        player_rank
+        class
+        race
+        player_gold
+        lvl
+        lvl_points
+        player_xp
+        strength
+        determination
+        intelligence
+        base_max_health
+        max_health
+        player_health
+        base_max_mana
+        max_mana
+        player_mana
+        mana_recovery
+        base_attack
+        player_attack
+        base_defense
+        player_skill_points
+        base_skill_points
+        max_skill_points
+        player_reputation
+        base_rank
+        player_skills
+        player_spells
+        player_equipment
+        player_inventory
+        enemy_kills
+        enemies_killed_stat
+        chat_states
+    )
+    mkdir -p saves
+    > "saves/$file_name"
+    for i in "${save_game_data[@]}"; do
+        if declare -p "$i" &>/dev/null; then
+            declare -p "$i" >> "saves/$file_name"
+        fi
+    done
+    clear
+    desc_newline
+    echo -e "${ITALIC}Game saved!${RESET}"
+}
+
+list_files(){
+    for file in saves/*.kor; do
+        [[ -e "$file" ]] || continue
+
+        local save_name="${file##*/}"
+        save_name="${save_name%.kor}"
+        printf "%-10s\n" "- $save_name"
+    done
+}
+
+load_handler(){
+    local load_file
+    mkdir -p saves
+    clear
+    echo -e "${BnR}- SAVED FILES${RESET}"
+    echo
+    list_files
+    echo
+    read -r -p "FILE NAME > " load_file
+    [[ -z "${load_file}" ]] && clear && desc_room && return
+    load_file="${load_file,,}"
+    load_file="${load_file// /_}"
+    load_file="${load_file}.kor"
+
+    if [[ ! -f "saves/$load_file" ]];then
+        echo "Save file not found."
+        press_any_to_continue
+        clear
+        desc_room
+        return
+    fi
+
+    clear
+
+    LOAD_FILE="${load_file}"
+
+}
+
+delete_handler(){
+    local delete_file
+    local confirm_delete
+    mkdir -p saves
+    clear
+    echo -e "${BnR}- SAVED FILES${RESET}"
+    echo
+    list_files
+    echo
+    read -r -p "FILE NAME TO DELETE > " delete_file
+    [[ -z "${delete_file}" ]] && clear && desc_room && return
+    delete_file="${delete_file,,}"
+    delete_file="${delete_file// /_}"
+    delete_file="${delete_file}.kor"
+
+    read -r -p "ARE YOU SURE
+YOU WANT TO DELETE:
+$delete_file?
+
+YES OR NO > " confirm_delete
+confirm_delete="${confirm_delete,,}"
+
+case $confirm_delete in
+    y|yes)
+        if [[ -f "saves/$delete_file" ]]; then
+            rm "saves/$delete_file"
+            echo "${delete_file%.kor} deleted"
+        else
+            echo "Save file not found."
+        fi
+        press_any_to_continue
+        clear
+        desc_room
+    ;;
+    n|no)
+        clear
+        desc_room
+        return
+    ;;
+    *)
+        echo "INVALID COMMAND"
+        clear
+        desc_room
+        return
+    ;;  
+esac
 
 }
