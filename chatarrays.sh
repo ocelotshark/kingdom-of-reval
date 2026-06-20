@@ -129,6 +129,33 @@ ${RESET}\"What do you want, ${name}?\"${RESET}"
 ${RESET}\"If you're here for work, ask about questing. 
 If you've finished something, collect your reward and move along.\"${RESET}"
 
+[clerk_info]="The clerk taps the end of her quill against her lips.
+
+\"If you're looking for work, the official way is to take
+a job from the quest board.\"
+
+She gestures toward a board across the room.
+
+\"Minor quests are always in circulation, so if none of
+the current ones interest you, wait a while and check
+back later.\"
+
+\"The guild's high mages built a portal just outside.
+It can take you directly to the minor quest dungeons,
+since traveling to each one would be impractical.\"
+
+She sets the quill down and straightens her posture.
+
+\"Major quests can also be found on the guild board.
+They're posted by locals and often offer unique rewards,
+while minor quests usually pay only gold and experience.\"
+
+She sighs, clearly exhausted from explaining this yet
+again.
+
+\"If you finish a guild-sponsored quest, come back to me
+and I'll process the completion and reward you.\""
+
 [clerk_collect_success_neutral]="The clerk reviews your papers, then gives a small nod.
 \"Looks legitimate enough.\"
 

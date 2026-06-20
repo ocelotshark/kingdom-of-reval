@@ -129,7 +129,7 @@ esac
 desc_room() {
     [[ ${in_random_dungeon} == false ]] && echo -e "${room_desc[$location]}"
     [[ ${in_random_dungeon} == true ]] && theme_banner="${banner_title//_/ }" && theme_banner="${theme_banner^^}" && echo -e "\e[7m${theme_banner}\e[0m\n" && 
-    [[ ${in_random_dungeon} == true ]] && echo "${random_dungeon_properties["$location,description"]}" && check_for_material && check_for_rescue && completed_quest_checker
+    [[ ${in_random_dungeon} == true ]] && echo -e "${random_dungeon_properties["$location,description"]}" && check_for_material && check_for_rescue && completed_quest_checker
  
     if [[ ${in_random_dungeon} == true ]]; then
         random_dungeon_spawner
@@ -1259,6 +1259,9 @@ case $verb in
 "turn") verb="collect";;
 "finished") verb="collect";;
 "complete") verb="collect";;
+"quest") verb="job";;
+"questing") verb="job";;
+"info") verb="information";;
 "gb") verb="goodbye" ;;
 "purchase") verb="buy";;
 "shop") verb="buy";;
@@ -1292,7 +1295,12 @@ case $verb:$who in
     *collect*:"clerk")
     collect_handler
     ;;
-
+    information:"clerk")
+    echo -e "${fandor_guild[clerk_info]}"
+    ;;
+    *job*:"clerk")
+    echo -e "${fandor_guild[clerk_info]}"
+    ;;
     *:"clerk")
     echo "You're not from around here are you?"
     echo
