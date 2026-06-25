@@ -30,13 +30,3 @@ $'(you flee!)\nYour ancestors collectively sigh.'
 $'(you run like you’ve done this before.)\nThat’s not a good thing.'
 $'(you escape!)\nYour reputation does not.'
 )
-
-#REMOVE THIS
-# flee_state_handler(){
-# clear
-# rand=$(( RANDOM % ${#flee[@]} ))
-# echo -e "${flee[$rand]}"
-# echo -e "\n\n"
-# read -r -p 'PRESS ANY ENTER TO CONTINUE' 
-# state="nav" 
-# }

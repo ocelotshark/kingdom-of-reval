@@ -129,7 +129,7 @@ esac
 desc_room() {
     [[ ${in_random_dungeon} == false ]] && echo -e "${room_desc[$location]}"
     [[ ${in_random_dungeon} == true ]] && theme_banner="${banner_title//_/ }" && theme_banner="${theme_banner^^}" && echo -e "\e[7m${theme_banner}\e[0m\n" && 
-    [[ ${in_random_dungeon} == true ]] && echo -e "${random_dungeon_properties["$location,description"]}" && check_for_material && check_for_rescue && completed_quest_checker
+    [[ ${in_random_dungeon} == true ]] && echo -e "${random_dungeon_properties["$location,description"]}" && check_for_random_event && check_for_material && check_for_rescue && completed_quest_checker
  
     if [[ ${in_random_dungeon} == true ]]; then
         random_dungeon_spawner

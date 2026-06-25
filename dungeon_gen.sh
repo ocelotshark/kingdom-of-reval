@@ -48,6 +48,55 @@ birth_chance=3
 # - NOT MY BEST WORK BUT IM LEARNING
 #-------------------------
 
+reset_rand_event_arrays(){
+
+    declare -gA random_dungeon_events=(
+        [abandoned_camp_state]=0
+        [abandoned_camp_looted]=0
+        [abandoned_camp_location]=""
+        [abandoned_camp_desc]="A cold campfire smolders in the darkness.
+
+    Someone left in a hurry."
+
+        [forgotten_cache_state]=0
+        [forgotten_cache_looted]=0
+        [forgotten_cache_location]=""
+        [forgotten_cache_desc]="You discover a loose stone in the wall.
+
+    Behind it sits a hidden cache."
+
+        [mana_spring_state]=0
+        [mana_spring_looted]=0
+        [mana_spring_location]=""
+        [mana_spring_desc]="Blue water bubbles from a crack in the stone."
+
+        [shrine_state]=0
+        [shrine_looted]=0
+        [shrine_location]=""
+        [shrine_desc]="A weathered shrine stands untouched by time."
+
+    )
+
+    declare -ga random_dungeon_events_array=(
+        "abandoned_camp"
+        "forgotten_cache"
+        "mana_spring"
+        "shrine"
+    )
+}
+
+check_for_random_event(){
+    for event in "${random_dungeon_events_array[@]}";do
+        local key_location="${event}_location"
+        local key_description="${event}_desc"
+
+        if [[ "${random_dungeon_events[$key_location]}" == "${location}" ]];then
+            printf "%s\n" "${random_dungeon_events[$key_description]}"
+            return
+        fi
+    done
+}
+
 random_dungeon_init() {
     up() {
     if (( ${r} - 1 < ${bt} )); then
@@ -364,6 +413,7 @@ scatter_rescue(){
     local rescue_desc="${rescue_desc_array[$rescue_desc_idx]}"
     minor_quest_item_data["${rescue_person}_description"]="${rescue_desc}"
 }
+
 shuffle_array() {
     local array_name="$1"
     declare -n arr="$array_name"
@@ -376,6 +426,27 @@ shuffle_array() {
         temp="${arr[i]}"
         arr[i]="${arr[j]}"
         arr[j]="$temp"
+    done
+}
+
+scatter_events(){
+    (( ${#rooms[@]} == 0 )) && return
+
+    reset_rand_event_arrays
+    local events=$(( RANDOM % ${#rooms[@]} + 1 ))
+    shuffle_array random_dungeon_events_array
+    local event_array_size=${#random_dungeon_events_array[@]}
+    local shuffled_rooms=("${rooms[@]}")
+    shuffle_array shuffled_rooms
+
+    if (( events > event_array_size ));then
+        events=$event_array_size
+    fi
+
+    local i
+    for ((i=0;i<events;i++));do
+        local key="${random_dungeon_events_array[$i]}_location"
+        random_dungeon_events[$key]="${shuffled_rooms[$i]}"
     done
 }
 
@@ -420,6 +491,7 @@ rand_theme_and_fill() {
     in_progress_random_dungeon[enemies_killed]=0
     scatter_materials
     scatter_rescue
+    scatter_events
 }
 #-------------------------
 #EXEC
