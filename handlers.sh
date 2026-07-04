@@ -13,6 +13,7 @@ check_for_material() {
 if [[ "${in_progress_random_dungeon[type]}" == "COLLECT" ]];then 
     quest_object_here=false
     if (( has_material[$location] > 0 ));then
+        echo
         echo "You find ${has_material[$location]} ${in_progress_random_dungeon[material],,}s here"
         quest_object_here=true
     else
@@ -33,6 +34,7 @@ if [[ "${in_progress_random_dungeon[type]}" == "RESCUE" ]];then
             display_name_fix+="${word^} "
         done
         display_name="${display_name_fix% }"
+        echo
         echo "${display_name} ${activity}"
         quest_object_here=true
     else
@@ -881,6 +883,23 @@ take_handler() {
 
     esac
 
+    if [[ -n "${current_event}" ]];then
+        case $noun in
+            belongings)
+            if [[ "${current_event}" == "abandoned_camp" ]]; then
+                abandoned_camp_handler
+                return
+            fi
+            ;;
+            *stone*)
+            if [[ "${current_event}" == "forgotten_cache" ]]; then
+                forgotten_cache_handler
+                return
+            fi
+            ;;
+        esac
+    fi
+
     case $noun:$location in
 
         *sword*:"fandor_gh_outside")
@@ -906,7 +925,26 @@ take_handler() {
 #-------------------------
 #USE VERB HANDLER
 #-------------------------
+attack_handler(){
+     if [[ -n "${current_event}" ]];then
+        case $noun in
+            *stone*)
+            if [[ "${current_event}" == "forgotten_cache" ]]; then
+                forgotten_cache_handler attacked
+                return
+            fi
+            ;;
+        esac
+    fi
 
+    case $noun in
+        *) 
+            desc_room
+            echo
+            echo -e "${ITALIC}You can't attack that!${RESET}"
+        ;;
+    esac
+}
 use_handler() {
 
     case $noun in
@@ -919,6 +957,23 @@ use_handler() {
         ;;
 
     esac
+
+    if [[ -n "${current_event}" ]];then
+        case $noun in
+            *water*)
+            if [[ "${current_event}" == "mana_spring" ]]; then
+                mana_spring_handler
+                return
+            fi
+            ;;
+            *shrine*)
+            if [[ "${current_event}" == "shrine" ]]; then
+                shrine_handler
+                return
+            fi
+            ;;
+        esac
+    fi
 
     case $noun:$location in
 
@@ -964,9 +1019,27 @@ use_handler() {
     esac      
 }
 
-#-------------------------
-#Name confirm
-#-------------------------
+pull_handler(){
+
+    if [[ -n "${current_event}" ]];then
+        case $noun in
+            *stone*)
+            if [[ "${current_event}" == "forgotten_cache" ]]; then
+                forgotten_cache_handler
+                return
+            fi
+            ;;
+        esac
+    fi
+
+    case $noun in
+        *) 
+            desc_room
+            echo
+            echo -e "${ITALIC}You can't pull that!${RESET}"
+        ;;
+    esac
+}
 
 name_confirm() {
             read -r -p "Name: " input_name
@@ -980,10 +1053,6 @@ name_confirm() {
             [[ "${confirm_name}" == "n"* ]] && name_confirm
             
             }
-
-#-------------------------
-#class confirm
-#-------------------------
 
 class_confirm() {
             read -r -p "Class: " input_class
@@ -1006,10 +1075,6 @@ class_confirm() {
             [[ "${confirm_class}" == "n"* ]] && class_confirm
             
             }   
-
-#-------------------------
-#race confirm
-#-------------------------
 
 race_confirm() {
             read -r -p "Race: " input_race
@@ -1059,10 +1124,6 @@ if [[ "${char_creation_done}" == false ]]; then
 fi
 
 }
-
-#-------------------------
-#TALK VERB HANDLER
-#-------------------------
 
 talk_handler() {
     
@@ -1147,9 +1208,7 @@ talk_handler() {
         esac
     fi     
 }
-#-------------------------
-#COLLECT HANDLER
-#-------------------------
+
     collect_handler(){
         if [[ "${in_progress_random_dungeon[state]}" == "complete" ]];then
 

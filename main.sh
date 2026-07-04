@@ -91,6 +91,8 @@ in_progress_random_dungeon[state]=false
 vendor="fandor_recruit_market"
 buying=true
 
+event=""
+
 for arg in "$@"; do 
   case "$arg" in
     -db|--debugger)

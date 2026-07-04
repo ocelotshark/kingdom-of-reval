@@ -56,24 +56,30 @@ reset_rand_event_arrays(){
         [abandoned_camp_location]=""
         [abandoned_camp_desc]="A cold campfire smolders in the darkness.
 
-    Someone left in a hurry."
+    Someone left in a hurry, leaving behind some of
+    their belongings."
+        [abandoned_camp_looted_desc]="A cold campfire smolders in the darkness.
 
+    It's been picked clean. Only smoldering coals
+    remain."
         [forgotten_cache_state]=0
         [forgotten_cache_looted]=0
         [forgotten_cache_location]=""
-        [forgotten_cache_desc]="You discover a loose stone in the wall.
-
-    Behind it sits a hidden cache."
+        [forgotten_cache_desc]="You discover a loose stone in the wall."
+        [forgotten_cache_looted_desc]="An empty cache remains where you removed the stone."
 
         [mana_spring_state]=0
         [mana_spring_looted]=0
         [mana_spring_location]=""
         [mana_spring_desc]="Blue water bubbles from a crack in the stone."
+        [mana_spring_looted_desc]="Blue water trickles from a crack in the stone.
+It gives off a faint glow in the surrounding darkness."
 
         [shrine_state]=0
         [shrine_looted]=0
         [shrine_location]=""
-        [shrine_desc]="A weathered shrine stands untouched by time."
+        [shrine_desc]="A weathered shrine stands untouched by time. It hums with ancient power."
+        [shrine_looted_desc]="The weathered shrine has fallen silent."
 
     )
 
@@ -85,14 +91,152 @@ reset_rand_event_arrays(){
     )
 }
 
+clear_desc_newline(){
+    clear
+    desc_newline
+    echo
+}
+
+random_minor_loot(){
+    local -a items=(
+    ale
+    apple
+    stale_bread
+    ironwill_stout
+    minor_health_potion
+    minor_mana_potion
+    )
+
+    local poor=3
+    local min=3
+    local max=$(( ${#items[@]} - 1 ))
+    local winning_index
+
+    if (( RANDOM % 100 < 70 ));then
+        winning_index=$(( RANDOM % poor ))
+    else
+        winning_index=$(( RANDOM % (max - min + 1) + min ))
+    fi
+
+    echo "${items[$winning_index]}"
+}
+
+shrine_handler(){
+    if [[ "${random_dungeon_events[shrine_looted]}" == 0 ]];then
+        random_dungeon_events[shrine_looted]=1
+        clear_desc_newline
+        printf "%b\n" "${ITALIC}You bow your head before the ancient shrine.
+
+${BLINK}A warm light washes over you, filling you with renewed strength!${RESET}"
+        (( player_health = max_health ))
+        echo
+        press_any_to_continue
+    else
+        clear_desc_newline
+        printf "%b\n" "${ITALIC}You kneel before the shrine.
+Nothing answers your silent prayer.${RESET}"
+    fi
+}
+
+mana_spring_handler(){
+    if [[ "${random_dungeon_events[mana_spring_looted]}" == 0 ]];then
+        random_dungeon_events[mana_spring_looted]=1
+        clear_desc_newline
+        printf "%b\n" "${ITALIC}You kneel beside the spring and cup the shimmering water
+in your hands.
+
+${BLINK}The cool water restores your ${BLUE}mana!${RESET}"
+        (( player_mana = max_mana ))
+        echo
+        press_any_to_continue
+    else
+        clear_desc_newline
+        printf "%b\n" "${ITALIC}You kneel beside the spring.
+Only a few drops remain. The spring needs time to recover.${RESET}"
+    fi
+}
+
+abandoned_camp_handler(){
+
+    local winning_item
+    winning_item=$(random_minor_loot)
+    local display_item="${winning_item//_/ }"
+    if [[ "${display_item:0:1}" =~ [AEIOUaeiou] ]];then
+        display_item="an ${display_item}"
+    else
+        display_item="a ${display_item}"
+    fi
+
+    if [[ "${random_dungeon_events[abandoned_camp_looted]}" == 0 ]];then
+        random_dungeon_events[abandoned_camp_looted]=1
+        clear_desc_newline
+        printf "%b\n" "${ITALIC}${REVERSE}You loot the abandoned camp.
+You find $display_item!${RESET}"
+        add_item_handler "${winning_item}"
+        echo
+        press_any_to_continue
+    else
+        clear_desc_newline
+        printf "%b\n" "${ITALIC}There is nothing left to take..${RESET}"
+    fi
+}
+
+forgotten_cache_handler(){
+    local winning_item
+    winning_item=$(random_minor_loot)
+    local display_item="${winning_item//_/ }"
+    if [[ "${display_item:0:1}" =~ [AEIOUaeiou] ]];then
+        display_item="an ${display_item}"
+    else
+        display_item="a ${display_item}"
+    fi
+
+    local attacked="$1"
+    #bird nest time baby
+    if [[ "${random_dungeon_events[forgotten_cache_looted]}" == 0 ]];then
+        random_dungeon_events[forgotten_cache_looted]=1
+        clear_desc_newline
+        if [[ "${attacked}" == "attacked" ]];then
+            printf "%b\n" "${ITALIC}${REVERSE}You pulverize the loose stone.
+Behind it rests a small hidden cache.
+
+You find $display_item!${RESET}"
+            add_item_handler "${winning_item}"
+            echo
+            press_any_to_continue
+        else
+            printf "%b\n" "${ITALIC}${REVERSE}You pull the loose stone free.
+Behind it rests a small hidden cache.
+You find $display_item!${RESET}"
+            add_item_handler "${winning_item}"
+            echo
+            press_any_to_continue
+        fi
+    else
+        clear_desc_newline
+        printf "%b\n" "${ITALIC}There is nothing left to take..${RESET}"
+    fi
+}
+
 check_for_random_event(){
+    local event
     for event in "${random_dungeon_events_array[@]}";do
         local key_location="${event}_location"
         local key_description="${event}_desc"
+        local key_looted_check="${event}_looted"
+        local key_looted_desc="${event}_looted_desc"
 
         if [[ "${random_dungeon_events[$key_location]}" == "${location}" ]];then
-            printf "%s\n" "${random_dungeon_events[$key_description]}"
-            return
+            current_event="${event}"
+            if [[ "${random_dungeon_events[$key_looted_check]}" == 0 ]];then
+                printf "\n%s\n" "${random_dungeon_events[$key_description]}"
+                return
+            else
+                printf "\n%s\n" "${random_dungeon_events[$key_looted_desc]}"
+                return
+            fi
+        else
+            current_event=""
         fi
     done
 }

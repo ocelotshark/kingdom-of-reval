@@ -41,6 +41,7 @@ story_mode_parser() {
             s) verb="start" ;;
             l) verb="look" ;;
             lk) verb="look" ;;
+            check) verb="look" ;;
             examine) verb="look" ;;
             see) verb="look" ;;
             investigate) verb="look" ;;
@@ -58,8 +59,41 @@ story_mode_parser() {
             purchase) verb="use" ;;
             sell) verb="use" ;;
             browse) verb="use" ;;
+            touch) verb="use" ;;
+            pray) verb="use" ;;
             lick) verb="taste" ;;
             ex) verb="exit" ;;
+            tug) verb="pull" ;;
+            move) verb="pull" ;;
+            drag) verb="pull" ;;
+            draw) verb="pull" ;;
+            tug) verb="pull" ;;
+            yank) verb="pull" ;;
+            haul) verb="pull" ;;
+            reel) verb="pull" ;;
+            tow) verb="pull" ;;
+            push) verb="push" ;;
+            shove) verb="push" ;;
+            press) verb="push" ;;
+            thrust) verb="push" ;;
+            jam) verb="push" ;;
+            force) verb="push" ;;
+            nudge) verb="push" ;;
+            boost) verb="push" ;;
+            attack) verb="attack" ;;
+            hit) verb="attack" ;;
+            strike) verb="attack" ;;
+            slash) verb="attack" ;;
+            stab) verb="attack" ;;
+            smash) verb="attack" ;;
+            bash) verb="attack" ;;
+            punch) verb="attack" ;;
+            kick) verb="attack" ;;
+            fight) verb="attack" ;;
+            assault) verb="attack" ;;
+            lunge) verb="attack" ;;
+            swipe) verb="attack" ;;
+            swing) verb="attack" ;;
         esac
 
 
@@ -160,6 +194,14 @@ if [[ "${first_load}" == false ]]; then #REGULAR PARSING
 
         equipment|eq)
             view_equipment
+        ;;
+
+        pull)
+            pull_handler
+        ;;
+
+        attack)
+            attack_handler
         ;;
 
         remove|rm)
