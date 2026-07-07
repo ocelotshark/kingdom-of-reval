@@ -43,7 +43,7 @@ declare -gA item_value=(
     [ironwill_stout_value]=40
 )
 declare -gA weapon_data=(
-    [short_sword_damage]=5
+    [short_sword_damage]=3
     [short_sword_description]="The blade is roughly forged but will get the job done."
     [short_sword_value]=10
 
@@ -76,17 +76,17 @@ declare -gA accessory_data=(
 
 declare -gA consumable_data=(
     [apple_modify_variable]="player_health"
-    [apple_modify_value]=5
+    [apple_modify_value]=3
     [apple_description]="Fruit with red or yellow or green skin and sweet to tart crisp whitish flesh."
     [apple_value]=3
 
     [stale_bread_modify_variable]="player_health"
-    [stale_bread_modify_value]=5
+    [stale_bread_modify_value]=3
     [stale_bread_description]="A brick disguised as bread. Surprisingly edible."
     [stale_bread_value]=3
 
     [ale_modify_variable]="player_health"
-    [ale_modify_value]=3
+    [ale_modify_value]=2
     [ale_description]="Cheap ale strong enough to make bad sound good, and ugly look pretty."
     [ale_value]=2
 

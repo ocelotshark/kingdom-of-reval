@@ -44,7 +44,7 @@ stat_modifi_handler() {
 
 determination_modifi=$(( determination / 10 ))
 intelligence_modifi=$(( intelligence * 3 ))
-strength_modifi=$(( strength / 3 ))
+strength_modifi=$(( strength / 6 ))
 
 [[ "${class}" == "warrior" ]] && warrior_modifi=$(( lvl * 1 ))
 [[ "${class}" == "cleric" ]] && cleric_modifi=$(( lvl * 10 ))

@@ -41,7 +41,7 @@ location_tmp="$location"
 lvl=1
 lvl_points=10
 player_xp=0
-xp_to_next_lvl="${player_levels[$(( lvl + 1 ))]}"
+xp_to_next_lvl=100
 
 strength=0
 determination=0

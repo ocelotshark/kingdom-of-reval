@@ -33,7 +33,7 @@ ${DIM}${BLINK}You can always review these from the game manual. ${RESET}
 ${BnR}Determination:${RESET} For every 10 points in determination 
 you'll receive 1 ${ITALIC}skill${RESET} point added to your maximum skill points.
 
-${BnR}Strength:${RESET} For every 3 points in stength 
+${BnR}Strength:${RESET} For every 6 points in stength 
 you'll receive 1 ${ITALIC}attack${RESET} point added to your maximum attack.
 
 ${BnR}Intelligence:${RESET} For every point in intelligence 
@@ -50,6 +50,19 @@ She looks up at you, but you feel like she is looking through you as
 if you are invisible.
 
 ${BLINK}Registration${RESET}, ${BLINK}collection${RESET}, or just here to ${BLINK}bother${RESET} me?
+
+${DIM}TUTORIAL:
+NOTICE THE \"TALKING TO CLERK\" PROMPT BEFORE YOUR INPUT. THIS INDICATES
+YOU ARE CHATTING WITH SOMEONE OR SOMETHING.
+
+WHILE CHATTING, IT'S BEST TO USE SINGLE-WORD KEYWORDS. SOME ARE
+OBVIOUS, LIKE THE EXAMPLES ABOVE. OTHERS ARE COMMON, SUCH AS: NAME,
+JOB, WORK, SUPPLIES, OR INFO.
+
+SOME KEYWORDS ARE LEARNED THROUGH YOUR TRAVELS. A PERSON IN ONE TOWN
+MAY TELL YOU TO ASK SOMEONE ELSE ABOUT A SPECIFIC SUBJECT.
+
+Type: registration, collection, or bother, to continue.${RESET}
 "
 
 [clerk_collection]="I only deal with registered adventurers."
