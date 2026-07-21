@@ -107,11 +107,16 @@ done
 input="${input,,}"
 case "${input}" in
     e|enter)
-        portal_enter
-        wait
-        clear
-        use_portal
-        state="nav"
+        if [[ "${in_progress_random_dungeon[state]}" == true ]];then
+            portal_enter
+            wait
+            clear
+            use_portal
+            state="nav"
+        else
+            printf "%s\n" "You haven't a purpose here, return when you do."
+            press_any_to_continue
+        fi
     ;;
     b|back)
         clear
@@ -1533,25 +1538,69 @@ fi
 #-------------------------
 #SPELL HANDLER
 #-------------------------
-
 spell_handler(){
 found=false
 
 for (( i=0; i<${#player_spells[@]}; i++ ));do
-            lower_case_spell="${player_spells[i],,}"
+            local lower_case_spell="${player_spells[i],,}"
             if [[ "${action}" == "${lower_case_spell}" ]]; then
                 declare -n spell_ref="${lower_case_spell// /_}"
-                magic_damage=$(( ${spell_ref[damage]} ))
-                mana_cost=$(( ${spell_ref[mana_consumption]} ))
+                local magic_damage=$(( ${spell_ref[damage]} ))
+                local mana_cost=$(( ${spell_ref[mana_consumption]} ))
                     if (( ${player_mana} - ${mana_cost} > -1 )); then
                         player_mana=$(( ${player_mana} - ${mana_cost} ))
                         ehp=$((ehp - magic_damage))
                         death_handler ; [[ "${enemy_dead}" == true ]] && return
-                        action1="You cast $lower_case_spell on the $ename for $magic_damage pts! It cost you $mana_cost mana."
+                        action1="You cast $lower_case_spell on the $ename for $magic_damage pts! It cost you ${BLUE}$mana_cost mana${RESET}."
                         armor_handler
+                        case "${spell_ref[special]}" in
+
+                            drain)
+                            recover_health $magic_damage
+                            action1="$action1\nStolen life restores $magic_damage ${RED}health${RESET} !"
+                            player_reputation=$((player_reputation - 2))
+                            ;;
+
+                            hptomana)
+                            player_health=$(( player_health / 2 ))
+                            local current_mana=$player_mana
+                            recover_mana player_health
+                            local recovered_mana=$(( player_mana - current_mana ))
+                            action1="${RED}Blood${RESET} becomes mana. ${BLUE}$recovered_mana Mana${RESET} restored."
+                            player_reputation=$((player_reputation - 2))
+                            ;;
+
+                            pray)
+                            local pray_roll=$(( RANDOM % 3 + 1))
+                            case $pray_roll in 
+                                1) #RESTORE ALL 3 STATS
+                                    action1="The gods finally notice you. About time.
+Your ${RED}Health${RESET}, ${BLUE}Mana${RESET}, and ${GREEN}Skill${RESET} points have been fully restored"
+                                    max_player_stats
+                                ;;
+                                2) #GIVE HALF XP NEEDED FOR NEXT LEVEL
+                                    local halfxp=$((xp_to_next_lvl / 2 ))
+                                    action1="Divine wisdom slams into your skull. It hurts... but you're smarter for it.
+You gain ${MAGENTA}$halfxp${RESET} experience points!"
+                                    (( player_xp += halfxp ))
+                                    level_up_check
+                                ;;
+                                3) #HIT THE CURRENT ENEMY FOR BASE ATTACK * 6
+                                    local divine_attack=$(( player_attack * 6 ))
+                                    ehp=$((ehp - divine_attack))
+                                    action1="The heavens point to your enemy. Your body becomes the God's
+weapon as they hit your foe with divine brutality.
+
+You inflict $divine_attack pts of damage to $ename!"
+                                    death_handler ; [[ "${enemy_dead}" == true ]] && return
+                                ;; 
+                            esac                                                                                                             
+                        esac
                         player_health=$(( player_health - eattack ))
                         action2="$ename hits you for $eattack pts."
                         found=true
+
+
                     else
                         action1="Not enough mana"
                         action2="$ename looks impatient"
@@ -1572,6 +1621,8 @@ fi
 
 set_enemy_attack() {
 
+    eattack="${enemy_dmg[$ename]}"
+
     case $combat_rank in
         #EATTACK_RANGES
         Z)
@@ -1579,11 +1630,15 @@ set_enemy_attack() {
         ;;
 
         F)
-        eattack=$(( RANDOM % ( f_max_damage - f_min_damage + 1 ) + f_min_damage ))
+        local max=$(( RANDOM % f_random_max + 1 ))
+        max=$(( max + eattack ))
+        eattack=$(( RANDOM % ( max - eattack + 1 ) + eattack ))
         ;;
 
         E)
-        eattack=$(( RANDOM % ( e_max_damage - e_min_damage + 1 ) + e_min_damage ))
+        local max=$(( RANDOM % e_random_max + 1 ))
+        max=$(( max + eattack ))
+        eattack=$(( RANDOM % ( max - eattack + 1 ) + eattack ))
         ;;
 
     esac 
@@ -1608,8 +1663,8 @@ comb_tui() {
     case $combat_menu in
 
         attack) 
-            echo "$action1"
-            echo "$action2"
+            echo -e "$action1"
+            echo -e "$action2"
             echo
             echo
             echo "$name     Health: $player_health     Mana: $player_mana   Skill Points: $player_skill_points"
@@ -1623,8 +1678,8 @@ comb_tui() {
         ;;
 
         magic) 
-            echo "$action1 $cast_spell"
-            echo "$action2"
+            echo -e "$action1 $cast_spell"
+            echo -e "$action2"
             echo
             echo
             echo "$name     Health: $player_health     Mana: $player_mana   Skill Points: $player_skill_points"
@@ -1636,8 +1691,8 @@ comb_tui() {
         ;;
 
         skills) 
-            echo "$action1"
-            echo "$action2"
+            echo -e "$action1"
+            echo -e "$action2"
             echo
             echo
             echo "$name     Health: $player_health     Mana: $player_mana   Skill Points: $player_skill_points"
@@ -1674,10 +1729,20 @@ comb_tui() {
 }
 
 melee_attack_handler() {
-    local attackdamage=$(( RANDOM % 3 + 0 + $player_attack ))
+    local attack_modifier_roll=$((RANDOM % player_attack_modifier + 1))
+    if (( determination == 0 ));then 
+        local crit_chance=2
+    else
+        local crit_chance=$((determination / 2 ))
+    fi
+    local attackdamage=$(( player_attack + attack_modifier_roll))
+    if (( RANDOM % 100 < crit_chance )); then
+        local attackdamage=$(( attackdamage * 175 / 100 ))
+        local crit_display="\n${RED}${BLINK}CRITICAL HIT!${RESET}"
+    fi
     ehp=$((ehp - attackdamage))
     death_handler ; [[ "${enemy_dead}" == true ]] && return
-    action1="You hit the $ename for $attackdamage pts!"
+    action1="You hit the $ename for $attackdamage pts!$crit_display"
     armor_handler
     player_health=$(( player_health - eattack ))
     action2="$ename hits you for $eattack"
@@ -1825,6 +1890,7 @@ Yes or No > " overwrite_confirm
         mana_recovery
         base_attack
         player_attack
+        player_attack_modifier
         base_defense
         player_skill_points
         base_skill_points

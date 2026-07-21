@@ -57,6 +57,7 @@ player_mana=60
 mana_recovery=5
 
 base_attack=1
+player_attack_modifier=3
 player_attack=0
 base_defense=0
 player_skill_points=0
@@ -70,7 +71,7 @@ combat_rank="F"
 base_rank="F"
 
 player_skills=("Cleave" "Shadow Step")
-player_spells=("Fireball" "Magic Missile")
+player_spells=("Fireball" "Magic Missile" "Drain" "Sacrifice" "Pray")
 player_uffs=()
 declare -gA has_material=()
 declare -gA enemy_kills=()
@@ -211,7 +212,7 @@ trophy_board_handler
 done
 
 #-------------------------
-#TROPHY SCREEN STATE
+#PORTAL SCREEN
 #-------------------------
 
 while [[ "${state}" == "portal_entrance" ]]; do

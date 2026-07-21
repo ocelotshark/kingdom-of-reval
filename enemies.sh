@@ -1,9 +1,24 @@
 #!/usr/bin/env bash
 
+f_random_max=6
+e_random_max=12
+
+declare -gA enemy_dmg=(
+    #z_rank
+    [DUMMY]=0
+    #f_rank
+    [Orc]=5
+    [Goblin]=6
+    [Bandit]=7
+    #e_rank
+    [Hobgoblin]=12
+    [Undead Skeleton]=13
+    [Shadow]=15
+)
+
 #-------------------------
 #[ Z ] SPECIAL ENEMIES
 #-------------------------
-
 z_rank_spawner() {
 
 declare -gA z_rank_enemies=(
@@ -16,7 +31,6 @@ ename=$1
 ehp=${z_rank_enemies[$ename]}
 
 }
-
 
 #-------------------------
 #[ F ] RANK ENEMIES
